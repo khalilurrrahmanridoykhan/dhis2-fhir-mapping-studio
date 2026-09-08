@@ -5,11 +5,14 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2026-09-08T10:01:00.460Z\n"
-"PO-Revision-Date: 2026-09-08T10:01:00.461Z\n"
+"POT-Creation-Date: 2026-09-08T10:02:47.814Z\n"
+"PO-Revision-Date: 2026-09-08T10:02:47.815Z\n"
 
 msgid "FHIR Mapping Studio"
 msgstr "FHIR Mapping Studio"
+
+msgid "Every required IG field is mapped."
+msgstr "Every required IG field is mapped."
 
 msgid "Could not load programs"
 msgstr "Could not load programs"

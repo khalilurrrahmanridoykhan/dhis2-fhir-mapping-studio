@@ -1,7 +1,10 @@
 import { CustomDataProvider } from '@dhis2/app-runtime'
+import { fireEvent, render, screen } from '@testing-library/react'
+import '@testing-library/jest-dom'
 import React from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App'
+import { requiredImmunizationIgFields } from './fhir/immunizationIgFields'
 
 it('renders without crashing', () => {
     const container = document.createElement('div')
@@ -23,4 +26,41 @@ it('renders without crashing', () => {
     )
 
     root.unmount()
+})
+
+it('selecting a program reveals step 2, the mapping table, with an unmapped-required-fields count', async () => {
+    const mockData = {
+        programs: {
+            programs: [
+                {
+                    id: 'prog1',
+                    name: 'Immunization program',
+                    programStages: [
+                        {
+                            id: 'stage1',
+                            name: 'Immunization stage',
+                            programStageDataElements: [{ dataElement: { id: 'de1', name: 'Vaccine given', valueType: 'TEXT' } }],
+                        },
+                    ],
+                },
+            ],
+        },
+    }
+
+    render(
+        <CustomDataProvider data={mockData}>
+            <App />
+        </CustomDataProvider>
+    )
+
+    fireEvent.click(await screen.findByText('Select a target program'))
+    fireEvent.click(await screen.findByText('Immunization program'))
+
+    expect(await screen.findByText('Step 2: map its data elements to the WHO SG Immunization IG')).toBeInTheDocument()
+    expect(screen.getByText('Vaccine given')).toBeInTheDocument()
+    // Nothing mapped yet -- every required IG field should be reported
+    // missing. Read the real count from immunizationIgFields.ts itself
+    // rather than hardcode a number here that could silently drift.
+    const requiredCount = requiredImmunizationIgFields().length
+    expect(screen.getByText(new RegExp(`${requiredCount} required IG field\\(s\\) still unmapped`))).toBeInTheDocument()
 })

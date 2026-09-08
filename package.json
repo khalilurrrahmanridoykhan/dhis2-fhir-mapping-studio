@@ -26,6 +26,8 @@
   },
   "devDependencies": {
     "@dhis2/cli-app-scripts": "^12.11.0-alpha.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.3",
     "@types/jest": "^30.0.0",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.7",

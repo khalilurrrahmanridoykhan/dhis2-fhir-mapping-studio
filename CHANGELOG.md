@@ -6,7 +6,27 @@ All notable changes to this project are documented here. Format follows
 
 ## [Unreleased]
 
-Nothing yet -- mapping-authoring work starts after the scaffold below.
+### Added
+
+- WHO SMART Guidelines Immunization IG field reference (22 fields, verified
+  against the real published `StructureDefinition`), plus a hand-crafted
+  IG-conformant sample Immunization resource for development.
+- Browse an instance's own `WITHOUT_REGISTRATION` programs and pick one to
+  map onto (`ProgramPicker`).
+- Author a Mapping Profile: a table pairing each of the picked program's
+  data elements with a WHO SG IG field (`MappingTable`), with a live count
+  of required IG fields still unmapped.
+- Persist one Mapping Profile per program to `dataStore`, loaded
+  automatically the next time that program is picked.
+- Connect to a FHIR server: list and select an existing DHIS2 Route, or
+  create one (with basic auth, bearer token, or API token). Every call to
+  the FHIR server runs through the Route -- never straight from the
+  browser -- so credentials never touch the client. The chosen connection
+  persists to `dataStore` and auto-loads on reopen.
+
+Not yet built: actually fetching a FHIR resource through the connected
+route, applying a saved Mapping Profile to it, previewing the result, and
+writing it into DHIS2 Tracker.
 
 ## [0.1.0] - 2026-09-08
 

@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2026-09-08T09:59:36.112Z\n"
-"PO-Revision-Date: 2026-09-08T09:59:36.112Z\n"
+"POT-Creation-Date: 2026-09-08T10:01:00.460Z\n"
+"PO-Revision-Date: 2026-09-08T10:01:00.461Z\n"
 
 msgid "FHIR Mapping Studio"
 msgstr "FHIR Mapping Studio"
@@ -19,6 +19,21 @@ msgstr "No eligible programs found"
 
 msgid "Select a target program"
 msgstr "Select a target program"
+
+msgid "DHIS2 data element"
+msgstr "DHIS2 data element"
+
+msgid "Value type"
+msgstr "Value type"
+
+msgid "WHO SG Immunization IG field"
+msgstr "WHO SG Immunization IG field"
+
+msgid "Not mapped"
+msgstr "Not mapped"
+
+msgid "required"
+msgstr "required"
 
 msgctxt "REGISTRATION programs to map onto yet."
 msgid "This instance has no WITHOUT"

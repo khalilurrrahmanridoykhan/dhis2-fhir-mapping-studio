@@ -1,0 +1,25 @@
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.buttonRow {
+  display: flex;
+  gap: 8px;
+}
+
+.createForm {
+  border: 1px solid #dbe4ea;
+  border-radius: 6px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.authOptions {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}

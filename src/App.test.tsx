@@ -6,15 +6,29 @@ import { createRoot } from 'react-dom/client'
 import App from './App'
 import { requiredImmunizationIgFields } from './fhir/immunizationIgFields'
 
+class MockNotFoundError extends Error {
+    details = { httpStatusCode: 404 }
+}
+
+// Shared across every test below -- App now also queries 'routes' and
+// 'me' (via useFhirRoute/useCurrentUserAuthorities for Step 1's
+// RoutePicker) and the connection dataStore key (via useFhirConnection),
+// on top of 'programs'. Each hook's own test file already covers the
+// populated and error states in detail; these mocks just keep App itself
+// mountable without touching Step 1's own behavior.
+const baseAppData = {
+    routes: { routes: [] },
+    me: { username: 'admin', authorities: ['ALL'] },
+    'dataStore/fhirMappingStudio/connection': async () => {
+        throw new MockNotFoundError('not found')
+    },
+}
+
 it('renders without crashing', () => {
     const container = document.createElement('div')
 
-    // App no longer queries 'me' directly -- its child ProgramPicker
-    // queries 'programs' (see useTargetPrograms.ts). Mocked here with an
-    // empty result; ProgramPicker.test.tsx already covers the populated
-    // and error states in detail, this smoke test only needs App itself
-    // to mount without crashing.
     const data = {
+        ...baseAppData,
         programs: { programs: [] },
     }
 
@@ -28,11 +42,8 @@ it('renders without crashing', () => {
     root.unmount()
 })
 
-class MockNotFoundError extends Error {
-    details = { httpStatusCode: 404 }
-}
-
 const mockProgramsData = {
+    ...baseAppData,
     programs: {
         programs: [
             {
@@ -56,7 +67,7 @@ const mockProgramsData = {
     },
 }
 
-it('selecting a program reveals step 2, the mapping table, with an unmapped-required-fields count', async () => {
+it('selecting a program reveals step 3, the mapping table, with an unmapped-required-fields count', async () => {
     render(
         <CustomDataProvider data={mockProgramsData}>
             <App />
@@ -66,7 +77,7 @@ it('selecting a program reveals step 2, the mapping table, with an unmapped-requ
     fireEvent.click(await screen.findByText('Select a target program'))
     fireEvent.click(await screen.findByText('Immunization program'))
 
-    expect(await screen.findByText('Step 2: map its data elements to the WHO SG Immunization IG')).toBeInTheDocument()
+    expect(await screen.findByText('Step 3: map its data elements to the WHO SG Immunization IG')).toBeInTheDocument()
     expect(screen.getByText('Vaccine given')).toBeInTheDocument()
     // Nothing mapped yet -- every required IG field should be reported
     // missing. Read the real count from immunizationIgFields.ts itself
@@ -96,10 +107,37 @@ it('clicking Save persists the current mapping and shows a saved confirmation', 
 
     fireEvent.click(await screen.findByText('Select a target program'))
     fireEvent.click(await screen.findByText('Immunization program'))
-    await screen.findByText('Step 2: map its data elements to the WHO SG Immunization IG')
+    await screen.findByText('Step 3: map its data elements to the WHO SG Immunization IG')
 
     fireEvent.click(screen.getByText('Save mapping'))
 
     expect(await screen.findByText('Saved')).toBeInTheDocument()
     expect(mutateCalls).toEqual(['read', 'create'])
+})
+
+it('picking a route in Step 1 persists the connection', async () => {
+    const connectionCalls: string[] = []
+    const data = {
+        ...mockProgramsData,
+        routes: { routes: [{ id: 'route1', name: 'Clinic FHIR server', code: 'clinic', url: 'https://hapi.fhir.org/baseR4/**' }] },
+        'dataStore/fhirMappingStudio/connection': async (type: string) => {
+            connectionCalls.push(type)
+            if (type === 'read') {
+                throw new MockNotFoundError('not found')
+            }
+            return null
+        },
+    }
+
+    render(
+        <CustomDataProvider data={data}>
+            <App />
+        </CustomDataProvider>
+    )
+
+    fireEvent.click(await screen.findByText('Select a route to a FHIR server'))
+    fireEvent.click(await screen.findByText('Clinic FHIR server'))
+
+    expect(await screen.findByText(/Selected route target/)).toBeInTheDocument()
+    expect(connectionCalls).toEqual(['read', 'create'])
 })

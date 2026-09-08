@@ -1,41 +1,32 @@
-import { useDataQuery } from '@dhis2/app-runtime'
 import i18n from '@dhis2/d2-i18n'
-import React, { FC } from 'react'
+import React, { FC, useState } from 'react'
+import { ProgramPicker } from './dhis2/ProgramPicker'
+import type { DhisTargetProgram } from './dhis2/types'
 import classes from './App.module.css'
 
-// Scaffold-stage connectivity check only -- confirms the app can reach the
-// connected DHIS2 instance's API before any real feature work starts, same
-// "verify before building" discipline as every other app in this family.
-// Replaced once the actual Mapping Profile / mapping-authoring UI lands --
-// see the design doc for the full plan this app implements:
+// The scaffold-stage /api/me connectivity check has done its job (proved
+// the app can reach a connected instance) and is replaced here by the
+// actual first real screen: picking a target program. The field-mapping
+// table that pairs its data elements against the WHO SG IG's fields comes
+// next, as its own commit -- see the design doc:
 // AIWORK/plan/Generic FHIR-to-DHIS2 Mapping Tool — Design.md
-interface QueryResults {
-    me: {
-        name: string
-    }
-}
-
-const query = {
-    me: {
-        resource: 'me',
-    },
-}
-
 const App: FC = () => {
-    const { error, loading, data } = useDataQuery<QueryResults>(query)
-
-    if (error) {
-        return <span>{i18n.t('ERROR')}</span>
-    }
-
-    if (loading) {
-        return <span>{i18n.t('Loading...')}</span>
-    }
+    const [selectedProgram, setSelectedProgram] = useState<DhisTargetProgram | null>(null)
 
     return (
         <div className={classes.container}>
             <h1>{i18n.t('FHIR Mapping Studio')}</h1>
-            <h3>{i18n.t('Connected as {{name}}. Scaffold stage -- no mapping features yet.', { name: data?.me?.name })}</h3>
+            <h3>{i18n.t('Step 1: pick the DHIS2 program to map onto')}</h3>
+            <ProgramPicker selectedProgramId={selectedProgram?.id ?? null} onSelect={setSelectedProgram} />
+
+            {selectedProgram && (
+                <p>
+                    {i18n.t('Selected: {{name}} -- {{count}} data element(s) in its stage. Field-mapping table comes next.', {
+                        name: selectedProgram.name,
+                        count: selectedProgram.programStages[0]?.programStageDataElements.length ?? 0,
+                    })}
+                </p>
+            )}
         </div>
     )
 }

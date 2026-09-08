@@ -5,20 +5,24 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2026-09-08T08:50:02.487Z\n"
-"PO-Revision-Date: 2026-09-08T08:50:02.487Z\n"
-
-msgid "ERROR"
-msgstr "ERROR"
-
-msgid "Loading..."
-msgstr "Loading..."
+"POT-Creation-Date: 2026-09-08T09:57:54.167Z\n"
+"PO-Revision-Date: 2026-09-08T09:57:54.167Z\n"
 
 msgid "FHIR Mapping Studio"
 msgstr "FHIR Mapping Studio"
 
-msgid "Connected as {{name}}. Scaffold stage -- no mapping features yet."
-msgstr "Connected as {{name}}. Scaffold stage -- no mapping features yet."
+msgid "Could not load programs"
+msgstr "Could not load programs"
+
+msgid "No eligible programs found"
+msgstr "No eligible programs found"
+
+msgid "Select a target program"
+msgstr "Select a target program"
+
+msgctxt "REGISTRATION programs to map onto yet."
+msgid "This instance has no WITHOUT"
+msgstr "This instance has no WITHOUT_REGISTRATION programs to map onto yet."
 
 msgctxt "Application title"
 msgid "__MANIFEST_APP_TITLE"

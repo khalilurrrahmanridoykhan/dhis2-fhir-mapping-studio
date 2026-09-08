@@ -1,4 +1,5 @@
 import { CircularLoader, NoticeBox, SingleSelect, SingleSelectOption } from '@dhis2/ui'
+import i18n from '@dhis2/d2-i18n'
 import React, { FC } from 'react'
 import { useTargetPrograms } from './useTargetPrograms'
 import type { DhisTargetProgram } from './types'
@@ -23,13 +24,17 @@ export const ProgramPicker: FC<ProgramPickerProps> = ({ selectedProgramId, onSel
   }
 
   if (error) {
-    return <NoticeBox error title="Could not load programs">{error.message}</NoticeBox>
+    return (
+      <NoticeBox error title={i18n.t('Could not load programs')}>
+        {error.message}
+      </NoticeBox>
+    )
   }
 
   if (programs.length === 0) {
     return (
-      <NoticeBox title="No eligible programs found">
-        This instance has no WITHOUT_REGISTRATION programs to map onto yet.
+      <NoticeBox title={i18n.t('No eligible programs found')}>
+        {i18n.t('This instance has no WITHOUT_REGISTRATION programs to map onto yet.')}
       </NoticeBox>
     )
   }
@@ -37,7 +42,7 @@ export const ProgramPicker: FC<ProgramPickerProps> = ({ selectedProgramId, onSel
   return (
     <SingleSelect
       selected={selectedProgramId ?? undefined}
-      placeholder="Select a target program"
+      placeholder={i18n.t('Select a target program')}
       onChange={({ selected }) => {
         const program = programs.find((p) => p.id === selected)
         if (program) {

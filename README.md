@@ -1,5 +1,10 @@
 # FHIR Mapping Studio
 
+[![CI](https://github.com/khalilurrrahmanridoykhan/dhis2-fhir-mapping-studio/actions/workflows/ci.yml/badge.svg)](https://github.com/khalilurrrahmanridoykhan/dhis2-fhir-mapping-studio/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![DHIS2 2.40+](https://img.shields.io/badge/DHIS2-2.40%2B-2C6693.svg)](d2.config.js)
+[![Status: scaffold](https://img.shields.io/badge/status-scaffold-orange.svg)](CHANGELOG.md)
+
 A native DHIS2 App for authoring a **DHIS2-side mapping** from a FHIR resource -- anchored on Immunization against the [WHO SMART Guidelines Immunization Implementation Guide](https://worldhealthorganization.github.io/smart-immunizations/) -- onto an instance's own **existing** programme, data elements, and org units.
 
 ## Status: scaffold only

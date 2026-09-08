@@ -28,27 +28,37 @@ it('renders without crashing', () => {
     root.unmount()
 })
 
-it('selecting a program reveals step 2, the mapping table, with an unmapped-required-fields count', async () => {
-    const mockData = {
-        programs: {
-            programs: [
-                {
-                    id: 'prog1',
-                    name: 'Immunization program',
-                    programStages: [
-                        {
-                            id: 'stage1',
-                            name: 'Immunization stage',
-                            programStageDataElements: [{ dataElement: { id: 'de1', name: 'Vaccine given', valueType: 'TEXT' } }],
-                        },
-                    ],
-                },
-            ],
-        },
-    }
+class MockNotFoundError extends Error {
+    details = { httpStatusCode: 404 }
+}
 
+const mockProgramsData = {
+    programs: {
+        programs: [
+            {
+                id: 'prog1',
+                name: 'Immunization program',
+                programStages: [
+                    {
+                        id: 'stage1',
+                        name: 'Immunization stage',
+                        programStageDataElements: [{ dataElement: { id: 'de1', name: 'Vaccine given', valueType: 'TEXT' } }],
+                    },
+                ],
+            },
+        ],
+    },
+    // useMappingProfile calls loadMappingProfile as soon as a program is
+    // picked -- without a mock for this exact resource key,
+    // CustomDataProvider's default failOnMiss throws, not simulates 404.
+    'dataStore/fhirMappingStudio/mappingProfile-prog1': async () => {
+        throw new MockNotFoundError('not found')
+    },
+}
+
+it('selecting a program reveals step 2, the mapping table, with an unmapped-required-fields count', async () => {
     render(
-        <CustomDataProvider data={mockData}>
+        <CustomDataProvider data={mockProgramsData}>
             <App />
         </CustomDataProvider>
     )
@@ -63,4 +73,33 @@ it('selecting a program reveals step 2, the mapping table, with an unmapped-requ
     // rather than hardcode a number here that could silently drift.
     const requiredCount = requiredImmunizationIgFields().length
     expect(screen.getByText(new RegExp(`${requiredCount} required IG field\\(s\\) still unmapped`))).toBeInTheDocument()
+})
+
+it('clicking Save persists the current mapping and shows a saved confirmation', async () => {
+    const mutateCalls: string[] = []
+    const data = {
+        ...mockProgramsData,
+        'dataStore/fhirMappingStudio/mappingProfile-prog1': async (type: string) => {
+            mutateCalls.push(type)
+            if (type === 'read') {
+                throw new MockNotFoundError('not found')
+            }
+            return null
+        },
+    }
+
+    render(
+        <CustomDataProvider data={data}>
+            <App />
+        </CustomDataProvider>
+    )
+
+    fireEvent.click(await screen.findByText('Select a target program'))
+    fireEvent.click(await screen.findByText('Immunization program'))
+    await screen.findByText('Step 2: map its data elements to the WHO SG Immunization IG')
+
+    fireEvent.click(screen.getByText('Save mapping'))
+
+    expect(await screen.findByText('Saved')).toBeInTheDocument()
+    expect(mutateCalls).toEqual(['read', 'create'])
 })

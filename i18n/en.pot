@@ -5,14 +5,29 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2026-09-08T10:51:52.401Z\n"
-"PO-Revision-Date: 2026-09-08T10:51:52.401Z\n"
+"POT-Creation-Date: 2026-09-08T10:53:25.674Z\n"
+"PO-Revision-Date: 2026-09-08T10:53:25.674Z\n"
 
 msgid "FHIR Mapping Studio"
 msgstr "FHIR Mapping Studio"
 
+msgid "Could not load a saved mapping for this program"
+msgstr "Could not load a saved mapping for this program"
+
 msgid "Every required IG field is mapped."
 msgstr "Every required IG field is mapped."
+
+msgid "Save mapping"
+msgstr "Save mapping"
+
+msgid "Saved"
+msgstr "Saved"
+
+msgid "This mapping is saved and will load automatically next time."
+msgstr "This mapping is saved and will load automatically next time."
+
+msgid "Could not save this mapping"
+msgstr "Could not save this mapping"
 
 msgid "Could not load programs"
 msgstr "Could not load programs"

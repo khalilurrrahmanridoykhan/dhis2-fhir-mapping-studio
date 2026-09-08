@@ -8,7 +8,7 @@
         "resolveJsonModule": true,
         "target": "ESNext",
         "module": "esnext",
-        "moduleResolution": "node"
+        "moduleResolution": "bundler"
     },
     "include": ["src", "types"]
 }

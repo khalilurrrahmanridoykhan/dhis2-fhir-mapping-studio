@@ -194,3 +194,73 @@ it('with a route already connected, Step 4 fetches a real resource and previews 
 
     jest.restoreAllMocks()
 })
+
+it('Step 5 appears only once a preview has been fetched, then writes exactly that resource to DHIS2', async () => {
+    const trackerCalls: unknown[] = []
+    const data = {
+        ...mockProgramsData,
+        routes: { routes: [{ id: 'route1', name: 'Clinic FHIR server', code: 'clinic', url: 'https://hapi.fhir.org/baseR4/**' }] },
+        'dataStore/fhirMappingStudio/connection': { routeId: 'route1' },
+        organisationUnits: (_type: string, query: { id?: string }) => {
+            if (query.id) {
+                return Promise.resolve({ id: query.id, displayName: 'National level', path: `/${query.id}`, children: [] })
+            }
+            return Promise.resolve({ organisationUnits: [{ id: 'orgUnit1' }] })
+        },
+        'tracker?async=false': async (type: string, query: { data?: unknown }) => {
+            trackerCalls.push({ type, data: query?.data })
+            return { status: 'OK', bundleReport: { typeReportMap: { EVENT: { objectReports: [{ uid: 'newEvent1' }] } } } }
+        },
+    }
+
+    global.fetch = jest.fn().mockResolvedValue({
+        ok: true,
+        status: 200,
+        statusText: 'OK',
+        json: async () => ({
+            resourceType: 'Bundle',
+            entry: [{ resource: { resourceType: 'Immunization', id: 'i1', status: 'completed', occurrenceDateTime: '2026-06-30T09:00:00+00:00' } }],
+        }),
+    }) as unknown as typeof fetch
+
+    render(
+        <CustomDataProvider data={data}>
+            <App />
+        </CustomDataProvider>
+    )
+
+    fireEvent.click(await screen.findByText('Select a target program'))
+    fireEvent.click(await screen.findByText('Immunization program'))
+    expect(screen.queryByText('Step 5: write this event to DHIS2')).not.toBeInTheDocument()
+
+    await screen.findByText('Step 4: preview against a real fetched resource')
+    fireEvent.click(screen.getByText('Fetch a resource and preview the mapping'))
+    await screen.findByText('Not mapped')
+
+    expect(await screen.findByText('Step 5: write this event to DHIS2')).toBeInTheDocument()
+
+    fireEvent.click(await screen.findByText('National level'))
+    fireEvent.click(screen.getByText('Write this event to DHIS2'))
+
+    expect(await screen.findByText('Event written')).toBeInTheDocument()
+    expect(screen.getByText(/newEvent1/)).toBeInTheDocument()
+    expect(trackerCalls).toEqual([
+        {
+            type: 'create',
+            data: {
+                events: [
+                    {
+                        program: 'prog1',
+                        programStage: 'stage1',
+                        orgUnit: 'orgUnit1',
+                        occurredAt: '2026-06-30T09:00:00+00:00',
+                        status: 'COMPLETED',
+                        dataValues: [],
+                    },
+                ],
+            },
+        },
+    ])
+
+    jest.restoreAllMocks()
+})

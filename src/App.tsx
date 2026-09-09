@@ -13,14 +13,20 @@ import { RoutePicker } from './fhirConnection/RoutePicker'
 import { useCurrentUserAuthorities } from './fhirConnection/useCurrentUserAuthorities'
 import { useFhirConnection } from './fhirConnection/useFhirConnection'
 import { useFhirRoute } from './fhirConnection/useFhirRoute'
+import { WriteToTracker } from './write/WriteToTracker'
+import { useWriteMappedEvent } from './write/useWriteMappedEvent'
 import classes from './App.module.css'
 
-// Persistence lands here: useMappingProfile loads a saved profile (or
-// starts empty) when a program is picked, and Save writes it back to
-// dataStore. The preview/sync pipeline that actually reads a FHIR
-// resource and writes it into DHIS2 using this profile is still a
-// separate, later piece -- see the design doc:
+// Five steps: connect (Step 1), pick a program (Step 2), map its fields
+// (Step 3, persisted via useMappingProfile), preview against one real
+// fetched resource (Step 4), then write that same previewed resource as
+// one Tracker event (Step 5) -- never blind, always exactly what Step 4
+// already showed. Full design and rationale:
 // AIWORK/plan/Generic FHIR-to-DHIS2 Mapping Tool — Design.md
+//
+// Still unbuilt: multi-resource batch sync (Step 4/5 only ever handle one
+// resource at a time), and the CodeableConcept-to-OPTION_SET code-mapping
+// step for coded fields (see toDhisDataValue.ts's own header comment).
 const App: FC = () => {
     const [selectedProgram, setSelectedProgram] = useState<DhisTargetProgram | null>(null)
     const { profile, setProfile, loading, loadError, saving, saveError, savedRecently, save } = useMappingProfile(selectedProgram)
@@ -29,6 +35,7 @@ const App: FC = () => {
     const fhirRoute = useFhirRoute()
     const connection = useFhirConnection()
     const preview = useMappingPreview(connection.routeId, selectedProgram, profile)
+    const write = useWriteMappedEvent(selectedProgram, profile, preview.resource)
 
     const required = requiredImmunizationIgFields()
     const missing = profile ? missingRequiredFieldMappings(profile, required) : required
@@ -109,6 +116,13 @@ const App: FC = () => {
                         <NoticeBox title={i18n.t('Connect a FHIR server in Step 1 to preview this mapping')}>
                             {i18n.t('Previewing needs a real resource fetched through a connected Route.')}
                         </NoticeBox>
+                    )}
+
+                    {preview.resource && (
+                        <>
+                            <h3>{i18n.t('Step 5: write this event to DHIS2')}</h3>
+                            <WriteToTracker write={write} />
+                        </>
                     )}
                 </>
             )}

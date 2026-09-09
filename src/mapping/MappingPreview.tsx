@@ -1,19 +1,41 @@
-import { Button, CircularLoader, NoticeBox, Table, TableBody, TableCell, TableCellHead, TableHead, TableRow, TableRowHead } from '@dhis2/ui'
+import {
+  Button,
+  CircularLoader,
+  NoticeBox,
+  SingleSelect,
+  SingleSelectOption,
+  Table,
+  TableBody,
+  TableCell,
+  TableCellHead,
+  TableHead,
+  TableRow,
+  TableRowHead,
+} from '@dhis2/ui'
 import i18n from '@dhis2/d2-i18n'
 import React, { FC } from 'react'
 import type { useMappingPreview } from './useMappingPreview'
 
 interface MappingPreviewProps {
   preview: ReturnType<typeof useMappingPreview>
+  /**
+   * Called when an admin picks which DHIS2 option one observed FHIR code
+   * corresponds to. Threaded through rather than handled locally, since
+   * the translation lives in the saved MappingProfile (App.tsx owns that
+   * state via setProfile), not in this component.
+   */
+  onCodeMappingChange: (dhisDataElementId: string, fhirCode: string, dhisOptionCode: string) => void
 }
 
 /**
  * Renders the result of useMappingPreview -- the actual "does this mapping
  * do what I think it does" check, run against one real resource fetched
  * live through the connected Route. Preview only: nothing here writes to
- * DHIS2 (see buildMappingPreview.ts's own header comment).
+ * DHIS2 (see buildMappingPreview.ts's own header comment) -- including the
+ * code-mapping picker below, which only records a translation into the
+ * profile; resolveDataValue.ts is what actually applies it at write time.
  */
-export const MappingPreview: FC<MappingPreviewProps> = ({ preview }) => {
+export const MappingPreview: FC<MappingPreviewProps> = ({ preview, onCodeMappingChange }) => {
   return (
     <div>
       <Button small loading={preview.loading} onClick={() => preview.fetchPreview()}>
@@ -41,6 +63,7 @@ export const MappingPreview: FC<MappingPreviewProps> = ({ preview }) => {
               <TableCellHead>{i18n.t('DHIS2 data element')}</TableCellHead>
               <TableCellHead>{i18n.t('Mapped WHO SG IG field')}</TableCellHead>
               <TableCellHead>{i18n.t('Value from the fetched resource')}</TableCellHead>
+              <TableCellHead>{i18n.t('Code mapping')}</TableCellHead>
             </TableRowHead>
           </TableHead>
           <TableBody>
@@ -49,6 +72,26 @@ export const MappingPreview: FC<MappingPreviewProps> = ({ preview }) => {
                 <TableCell>{row.dhisDataElementName}</TableCell>
                 <TableCell>{row.fhirFieldLabel ?? i18n.t('Not mapped')}</TableCell>
                 <TableCell>{row.displayValue}</TableCell>
+                <TableCell>
+                  {row.codeMapping ? (
+                    <>
+                      <SingleSelect
+                        selected={row.codeMapping.resolvedOptionCode ?? undefined}
+                        placeholder={i18n.t('Map code "{{code}}" to...', { code: row.codeMapping.observedCode })}
+                        onChange={({ selected }) => onCodeMappingChange(row.dhisDataElementId, row.codeMapping!.observedCode, selected)}
+                      >
+                        {row.codeMapping.optionSet.options.map((option) => (
+                          <SingleSelectOption key={option.code} value={option.code} label={option.name} />
+                        ))}
+                      </SingleSelect>
+                      {!row.codeMapping.resolvedOptionCode && (
+                        <NoticeBox warning title={i18n.t('Not yet mapped -- omitted from what gets written')} />
+                      )}
+                    </>
+                  ) : (
+                    '--'
+                  )}
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>

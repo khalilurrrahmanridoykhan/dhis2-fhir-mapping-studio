@@ -13,6 +13,11 @@ import type { MappingProfile } from './MappingProfile'
  */
 export function useMappingPreview(routeId: string | null, program: DhisTargetProgram | null, profile: MappingProfile | null) {
   const [rows, setRows] = useState<MappingPreviewRow[] | null>(null)
+  // The raw resource the rows above were built from -- exposed so a
+  // later write step (see src/write/) submits exactly what was already
+  // shown in the preview, not a second, independently fetched resource
+  // that could differ from it.
+  const [resource, setResource] = useState<Record<string, unknown> | null>(null)
   const [resourceCount, setResourceCount] = useState(0)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<Error | null>(null)
@@ -22,6 +27,7 @@ export function useMappingPreview(routeId: string | null, program: DhisTargetPro
   // its rows would show a stale program's data elements.
   useEffect(() => {
     setRows(null)
+    setResource(null)
     setError(null)
   }, [program?.id])
 
@@ -34,14 +40,21 @@ export function useMappingPreview(routeId: string | null, program: DhisTargetPro
     try {
       const resources = await fetchImmunizationPreview(routeId, 1)
       setResourceCount(resources.length)
-      setRows(resources.length > 0 ? buildMappingPreview(program, profile, resources[0]) : [])
+      if (resources.length > 0) {
+        setResource(resources[0])
+        setRows(buildMappingPreview(program, profile, resources[0]))
+      } else {
+        setResource(null)
+        setRows([])
+      }
     } catch (err) {
       setError(err as Error)
       setRows(null)
+      setResource(null)
     } finally {
       setLoading(false)
     }
   }
 
-  return { rows, resourceCount, loading, error, fetchPreview }
+  return { rows, resource, resourceCount, loading, error, fetchPreview }
 }

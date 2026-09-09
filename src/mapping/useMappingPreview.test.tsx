@@ -53,6 +53,8 @@ describe('useMappingPreview', () => {
     expect(result.current.rows).toEqual([
       { dhisDataElementId: 'de-status', dhisDataElementName: 'Vaccination status', fhirFieldPath: 'status', fhirFieldLabel: 'Status', displayValue: 'completed' },
     ])
+    // Exposed so a later write step submits exactly what was previewed.
+    expect(result.current.resource).toEqual({ resourceType: 'Immunization', id: 'i1', status: 'completed' })
   })
 
   it('an empty result sets rows to [] (distinct from null/"not fetched yet")', async () => {

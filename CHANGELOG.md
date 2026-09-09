@@ -29,8 +29,17 @@ All notable changes to this project are documented here. Format follows
   DHIS2 data element, exactly what value its mapped WHO SG IG field reads
   from that resource -- before anything is ever written to DHIS2.
 
-Not yet built: actually writing the mapped result into DHIS2 Tracker, and
-the CodeableConcept-to-OPTION_SET code-mapping step for coded fields.
+- Write the previewed resource to DHIS2 Tracker (Step 5): pick a target
+  organisation unit, then write exactly the resource Step 4 already
+  fetched and showed -- never a second, independent fetch -- as one real
+  Tracker event, via `/api/tracker`. Shows the created event's real id on
+  success, or DHIS2's own rejection message on failure.
+
+Known, deliberate limitations: one resource at a time (no multi-resource
+batch sync yet), and the CodeableConcept-to-OPTION_SET code-mapping step
+for coded fields is still unbuilt -- writing a coded field onto an
+OPTION_SET data element may be rejected by DHIS2 until that exists, and
+that rejection surfaces as a normal, visible error rather than silently.
 
 ## [0.1.0] - 2026-09-08
 

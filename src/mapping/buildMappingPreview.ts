@@ -1,8 +1,17 @@
-import type { DhisTargetProgram } from '../dhis2/types'
+import type { DhisOptionSet, DhisTargetProgram } from '../dhis2/types'
 import { immunizationIgFields } from '../fhir/immunizationIgFields'
+import { extractCodeableConcept } from '../fhir/extractCodeableConcept'
 import { formatFhirValue } from '../fhir/formatFhirValue'
 import { readImmunizationField } from '../fhir/readImmunizationField'
-import { fhirFieldMappedTo, type MappingProfile } from './MappingProfile'
+import { dhisOptionCodeFor, fhirFieldMappedTo, type MappingProfile } from './MappingProfile'
+
+export interface MappingPreviewRowCodeMapping {
+  optionSet: DhisOptionSet
+  observedCode: string
+  observedDisplay: string | null
+  /** What this profile already translates observedCode to, if anything. */
+  resolvedOptionCode: string | null
+}
 
 export interface MappingPreviewRow {
   dhisDataElementId: string
@@ -10,6 +19,14 @@ export interface MappingPreviewRow {
   fhirFieldPath: string | null
   fhirFieldLabel: string | null
   displayValue: string
+  /**
+   * Present only when this row's DHIS2 data element has an OPTION_SET and
+   * the mapped field's raw value on this resource is CodeableConcept-shaped
+   * with a real code -- the actual code-mapping opportunity for this row,
+   * driven by what this specific fetched resource contains (see
+   * extractCodeableConcept.ts's own header comment for why).
+   */
+  codeMapping: MappingPreviewRowCodeMapping | null
 }
 
 /**
@@ -18,8 +35,14 @@ export interface MappingPreviewRow {
  * just-fetched FHIR resource carries for whichever IG field it's mapped
  * to, and formats it for display. This is preview only: nothing here
  * writes to DHIS2 or transforms the value into a DHIS2-ready payload
- * shape (e.g. a CodeableConcept into an OPTION_SET code) -- that's the
- * still-unbuilt code-mapping step from the design doc.
+ * shape -- see resolveDataValue.ts in src/write/, which is what actually
+ * applies a row's codeMapping at write time.
+ *
+ * Each row also flags whether it's a real code-mapping opportunity
+ * (codeMapping, non-null only for a CodeableConcept-typed field mapped
+ * onto an OPTION_SET data element) -- driven by what this specific
+ * fetched resource actually contains, not a hardcoded per-field type
+ * table (see extractCodeableConcept.ts).
  *
  * One row per data element, in the order the program defines them --
  * including unmapped ones (fhirFieldPath/fhirFieldLabel null, displayValue
@@ -42,11 +65,26 @@ export function buildMappingPreview(
         fhirFieldPath: null,
         fhirFieldLabel: null,
         displayValue: 'Not mapped',
+        codeMapping: null,
       }
     }
 
     const field = immunizationIgFields.find((f) => f.path === fhirFieldPath)
     const rawValue = field ? readImmunizationField(resource, field) : undefined
+
+    let codeMapping: MappingPreviewRowCodeMapping | null = null
+    if (dataElement.optionSet) {
+      const codeableConcept = extractCodeableConcept(rawValue)
+      const observedCode = codeableConcept?.coding?.[0]?.code
+      if (observedCode) {
+        codeMapping = {
+          optionSet: dataElement.optionSet,
+          observedCode,
+          observedDisplay: codeableConcept?.coding?.[0]?.display ?? codeableConcept?.text ?? null,
+          resolvedOptionCode: dhisOptionCodeFor(profile, dataElement.id, observedCode),
+        }
+      }
+    }
 
     return {
       dhisDataElementId: dataElement.id,
@@ -54,6 +92,7 @@ export function buildMappingPreview(
       fhirFieldPath,
       fhirFieldLabel: field?.label ?? fhirFieldPath,
       displayValue: formatFhirValue(rawValue),
+      codeMapping,
     }
   })
 }

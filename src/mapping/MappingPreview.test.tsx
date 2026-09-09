@@ -9,6 +9,7 @@ type PreviewResult = ReturnType<typeof useMappingPreview>
 function makePreview(overrides: Partial<PreviewResult> = {}): PreviewResult {
   return {
     rows: null,
+    resource: null,
     resourceCount: 0,
     loading: false,
     error: null,
@@ -43,8 +44,8 @@ describe('MappingPreview', () => {
         preview={makePreview({
           resourceCount: 1,
           rows: [
-            { dhisDataElementId: 'de1', dhisDataElementName: 'Vaccination status', fhirFieldPath: 'status', fhirFieldLabel: 'Status', displayValue: 'completed' },
-            { dhisDataElementId: 'de2', dhisDataElementName: 'Unrelated field', fhirFieldPath: null, fhirFieldLabel: null, displayValue: 'Not mapped' },
+            { dhisDataElementId: 'de1', dhisDataElementName: 'Vaccination status', fhirFieldPath: 'status', fhirFieldLabel: 'Status', displayValue: 'completed', codeMapping: null },
+            { dhisDataElementId: 'de2', dhisDataElementName: 'Unrelated field', fhirFieldPath: null, fhirFieldLabel: null, displayValue: 'Not mapped', codeMapping: null },
           ],
         })}
       />

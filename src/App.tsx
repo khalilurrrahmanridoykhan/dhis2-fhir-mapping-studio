@@ -4,7 +4,9 @@ import React, { FC, useState } from 'react'
 import { ProgramPicker } from './dhis2/ProgramPicker'
 import type { DhisTargetProgram } from './dhis2/types'
 import { isMappingComplete, missingRequiredFieldMappings } from './mapping/MappingProfile'
+import { MappingPreview } from './mapping/MappingPreview'
 import { MappingTable } from './mapping/MappingTable'
+import { useMappingPreview } from './mapping/useMappingPreview'
 import { useMappingProfile } from './mapping/useMappingProfile'
 import { requiredImmunizationIgFields } from './fhir/immunizationIgFields'
 import { RoutePicker } from './fhirConnection/RoutePicker'
@@ -26,6 +28,7 @@ const App: FC = () => {
     const authorities = useCurrentUserAuthorities()
     const fhirRoute = useFhirRoute()
     const connection = useFhirConnection()
+    const preview = useMappingPreview(connection.routeId, selectedProgram, profile)
 
     const required = requiredImmunizationIgFields()
     const missing = profile ? missingRequiredFieldMappings(profile, required) : required
@@ -94,6 +97,17 @@ const App: FC = () => {
                     {saveError && (
                         <NoticeBox error title={i18n.t('Could not save this mapping')}>
                             {saveError.message}
+                        </NoticeBox>
+                    )}
+
+                    {connection.routeId ? (
+                        <>
+                            <h3>{i18n.t('Step 4: preview against a real fetched resource')}</h3>
+                            <MappingPreview preview={preview} />
+                        </>
+                    ) : (
+                        <NoticeBox title={i18n.t('Connect a FHIR server in Step 1 to preview this mapping')}>
+                            {i18n.t('Previewing needs a real resource fetched through a connected Route.')}
                         </NoticeBox>
                     )}
                 </>

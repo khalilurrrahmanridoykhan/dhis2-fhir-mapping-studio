@@ -141,3 +141,56 @@ it('picking a route in Step 1 persists the connection', async () => {
     expect(await screen.findByText(/Selected route target/)).toBeInTheDocument()
     expect(connectionCalls).toEqual(['read', 'create'])
 })
+
+it('Step 3 asks to connect a FHIR server first when no route is picked yet', async () => {
+    render(
+        <CustomDataProvider data={mockProgramsData}>
+            <App />
+        </CustomDataProvider>
+    )
+
+    fireEvent.click(await screen.findByText('Select a target program'))
+    fireEvent.click(await screen.findByText('Immunization program'))
+
+    expect(await screen.findByText('Connect a FHIR server in Step 1 to preview this mapping')).toBeInTheDocument()
+    expect(screen.queryByText('Step 4: preview against a real fetched resource')).not.toBeInTheDocument()
+})
+
+it('with a route already connected, Step 4 fetches a real resource and previews the mapping', async () => {
+    const data = {
+        ...mockProgramsData,
+        routes: { routes: [{ id: 'route1', name: 'Clinic FHIR server', code: 'clinic', url: 'https://hapi.fhir.org/baseR4/**' }] },
+        'dataStore/fhirMappingStudio/connection': { routeId: 'route1' },
+    }
+
+    global.fetch = jest.fn().mockResolvedValue({
+        ok: true,
+        status: 200,
+        statusText: 'OK',
+        json: async () => ({
+            resourceType: 'Bundle',
+            entry: [{ resource: { resourceType: 'Immunization', id: 'i1', status: 'completed' } }],
+        }),
+    }) as unknown as typeof fetch
+
+    render(
+        <CustomDataProvider data={data}>
+            <App />
+        </CustomDataProvider>
+    )
+
+    fireEvent.click(await screen.findByText('Select a target program'))
+    fireEvent.click(await screen.findByText('Immunization program'))
+
+    expect(await screen.findByText('Step 4: preview against a real fetched resource')).toBeInTheDocument()
+
+    fireEvent.click(screen.getByText('Fetch a resource and preview the mapping'))
+
+    expect(await screen.findByText('Not mapped')).toBeInTheDocument()
+    expect(global.fetch).toHaveBeenCalledWith(
+        `${window.location.origin}/api/routes/route1/run/Immunization?_count=1`,
+        expect.anything()
+    )
+
+    jest.restoreAllMocks()
+})

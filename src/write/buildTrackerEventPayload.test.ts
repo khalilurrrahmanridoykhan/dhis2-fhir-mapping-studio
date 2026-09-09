@@ -1,6 +1,6 @@
 import { buildTrackerEventPayload } from './buildTrackerEventPayload'
-import { setFieldMapping, type MappingProfile } from '../mapping/MappingProfile'
-import type { DhisTargetProgram } from '../dhis2/types'
+import { setCodeMapping, setFieldMapping, type MappingProfile } from '../mapping/MappingProfile'
+import type { DhisOptionSet, DhisTargetProgram } from '../dhis2/types'
 
 const program: DhisTargetProgram = {
   id: 'prog1',
@@ -67,5 +67,39 @@ describe('buildTrackerEventPayload', () => {
     const resourceMissingDate = { resourceType: 'Immunization', id: 'r2', status: 'completed' }
     const payload = buildTrackerEventPayload(program, emptyProfile, resourceMissingDate, 'orgUnit1')
     expect(payload).toBeNull()
+  })
+})
+
+describe('buildTrackerEventPayload -- code mapping', () => {
+  const vaccineOptionSet: DhisOptionSet = { id: 'os1', name: 'Vaccines', options: [{ code: 'YELLOW_FEVER', name: 'Yellow fever' }] }
+
+  const optionSetProgram: DhisTargetProgram = {
+    id: 'prog1',
+    name: 'Immunization program',
+    programStages: [
+      {
+        id: 'stage1',
+        name: 'Immunization stage',
+        programStageDataElements: [
+          { dataElement: { id: 'de-vaccine', name: 'Vaccine given', valueType: 'OPTION_SET', optionSet: vaccineOptionSet } },
+        ],
+      },
+    ],
+  }
+
+  const optionSetEmptyProfile: MappingProfile = { programId: 'prog1', programStageId: 'stage1', fieldMappings: [] }
+
+  it('writes the real DHIS2 option code, not display text, once a code translation is saved', () => {
+    let profile = setFieldMapping(optionSetEmptyProfile, 'de-vaccine', 'vaccineCode')
+    profile = setCodeMapping(profile, 'de-vaccine', 'YF', 'YELLOW_FEVER')
+
+    const payload = buildTrackerEventPayload(optionSetProgram, profile, conformantResource, 'orgUnit1')
+    expect(payload?.events[0].dataValues).toEqual([{ dataElement: 'de-vaccine', value: 'YELLOW_FEVER' }])
+  })
+
+  it('omits the data element entirely (not display text) when no code translation has been saved yet', () => {
+    const profile = setFieldMapping(optionSetEmptyProfile, 'de-vaccine', 'vaccineCode')
+    const payload = buildTrackerEventPayload(optionSetProgram, profile, conformantResource, 'orgUnit1')
+    expect(payload?.events[0].dataValues).toEqual([])
   })
 })

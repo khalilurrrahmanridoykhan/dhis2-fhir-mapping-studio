@@ -3,7 +3,7 @@ import i18n from '@dhis2/d2-i18n'
 import React, { FC, useState } from 'react'
 import { ProgramPicker } from './dhis2/ProgramPicker'
 import type { DhisTargetProgram } from './dhis2/types'
-import { isMappingComplete, missingRequiredFieldMappings } from './mapping/MappingProfile'
+import { isMappingComplete, missingRequiredFieldMappings, setCodeMapping } from './mapping/MappingProfile'
 import { MappingPreview } from './mapping/MappingPreview'
 import { MappingTable } from './mapping/MappingTable'
 import { useMappingPreview } from './mapping/useMappingPreview'
@@ -19,14 +19,15 @@ import classes from './App.module.css'
 
 // Five steps: connect (Step 1), pick a program (Step 2), map its fields
 // (Step 3, persisted via useMappingProfile), preview against one real
-// fetched resource (Step 4), then write that same previewed resource as
-// one Tracker event (Step 5) -- never blind, always exactly what Step 4
-// already showed. Full design and rationale:
-// AIWORK/plan/Generic FHIR-to-DHIS2 Mapping Tool — Design.md
+// fetched resource (Step 4) -- including, inline, mapping any observed
+// FHIR code to a DHIS2 option code for OPTION_SET fields -- then write
+// that same previewed resource as one Tracker event (Step 5), applying
+// those code translations, via resolveDataValue. Never blind: Step 5
+// always writes exactly what Step 4 already showed. Full design and
+// rationale: AIWORK/plan/Generic FHIR-to-DHIS2 Mapping Tool — Design.md
 //
-// Still unbuilt: multi-resource batch sync (Step 4/5 only ever handle one
-// resource at a time), and the CodeableConcept-to-OPTION_SET code-mapping
-// step for coded fields (see toDhisDataValue.ts's own header comment).
+// Still unbuilt: multi-resource batch sync -- Step 4/5 only ever handle
+// one resource at a time.
 const App: FC = () => {
     const [selectedProgram, setSelectedProgram] = useState<DhisTargetProgram | null>(null)
     const { profile, setProfile, loading, loadError, saving, saveError, savedRecently, save } = useMappingProfile(selectedProgram)
@@ -110,7 +111,12 @@ const App: FC = () => {
                     {connection.routeId ? (
                         <>
                             <h3>{i18n.t('Step 4: preview against a real fetched resource')}</h3>
-                            <MappingPreview preview={preview} />
+                            <MappingPreview
+                                preview={preview}
+                                onCodeMappingChange={(dhisDataElementId, fhirCode, dhisOptionCode) =>
+                                    setProfile(setCodeMapping(profile, dhisDataElementId, fhirCode, dhisOptionCode))
+                                }
+                            />
                         </>
                     ) : (
                         <NoticeBox title={i18n.t('Connect a FHIR server in Step 1 to preview this mapping')}>

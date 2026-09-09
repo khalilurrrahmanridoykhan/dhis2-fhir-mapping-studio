@@ -1,5 +1,5 @@
 import { CustomDataProvider } from '@dhis2/app-runtime'
-import { fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import React from 'react'
 import { createRoot } from 'react-dom/client'
@@ -191,6 +191,124 @@ it('with a route already connected, Step 4 fetches a real resource and previews 
         `${window.location.origin}/api/routes/route1/run/Immunization?_count=1`,
         expect.anything()
     )
+
+    jest.restoreAllMocks()
+})
+
+it('Step 4 lets an admin map an observed FHIR code to a DHIS2 option, and Step 5 writes the real option code', async () => {
+    const vaccineOptionSetProgramsData = {
+        ...baseAppData,
+        programs: {
+            programs: [
+                {
+                    id: 'prog1',
+                    name: 'Immunization program',
+                    programStages: [
+                        {
+                            id: 'stage1',
+                            name: 'Immunization stage',
+                            programStageDataElements: [
+                                {
+                                    dataElement: {
+                                        id: 'de1',
+                                        name: 'Vaccine given',
+                                        valueType: 'OPTION_SET',
+                                        optionSet: { id: 'os1', name: 'Vaccines', options: [{ code: 'YELLOW_FEVER', name: 'Yellow fever' }] },
+                                    },
+                                },
+                            ],
+                        },
+                    ],
+                },
+            ],
+        },
+        // Already mapped, so Step 4's preview has something to translate --
+        // this test is about the code-mapping step itself, not authoring
+        // the field mapping (already covered by other tests above).
+        'dataStore/fhirMappingStudio/mappingProfile-prog1': {
+            programId: 'prog1',
+            programStageId: 'stage1',
+            fieldMappings: [{ dhisDataElementId: 'de1', fhirFieldPath: 'vaccineCode' }],
+        },
+        routes: { routes: [{ id: 'route1', name: 'Clinic FHIR server', code: 'clinic', url: 'https://hapi.fhir.org/baseR4/**' }] },
+        'dataStore/fhirMappingStudio/connection': { routeId: 'route1' },
+        organisationUnits: (_type: string, query: { id?: string }) => {
+            if (query.id) {
+                return Promise.resolve({ id: query.id, displayName: 'National level', path: `/${query.id}`, children: [] })
+            }
+            return Promise.resolve({ organisationUnits: [{ id: 'orgUnit1' }] })
+        },
+    }
+    const trackerCalls: unknown[] = []
+    const trackerMock = async (type: string, query: { data?: unknown }) => {
+        trackerCalls.push({ type, data: query?.data })
+        return { status: 'OK', bundleReport: { typeReportMap: { EVENT: { objectReports: [{ uid: 'newEvent1' }] } } } }
+    }
+
+    global.fetch = jest.fn().mockResolvedValue({
+        ok: true,
+        status: 200,
+        statusText: 'OK',
+        json: async () => ({
+            resourceType: 'Bundle',
+            entry: [
+                {
+                    resource: {
+                        resourceType: 'Immunization',
+                        id: 'i1',
+                        status: 'completed',
+                        occurrenceDateTime: '2026-06-30T09:00:00+00:00',
+                        vaccineCode: { coding: [{ code: 'YF', display: 'Yellow fever vaccine' }] },
+                    },
+                },
+            ],
+        }),
+    }) as unknown as typeof fetch
+
+    render(
+        <CustomDataProvider data={{ ...vaccineOptionSetProgramsData, 'tracker?async=false': trackerMock }}>
+            <App />
+        </CustomDataProvider>
+    )
+
+    fireEvent.click(await screen.findByText('Select a target program'))
+    fireEvent.click(await screen.findByText('Immunization program'))
+    await screen.findByText('Step 4: preview against a real fetched resource')
+
+    fireEvent.click(screen.getByText('Fetch a resource and preview the mapping'))
+
+    // The code-mapping picker appears, unmapped, for the observed code.
+    expect(await screen.findByText('Map code "YF" to...')).toBeInTheDocument()
+    expect(screen.getByText('Not yet mapped -- omitted from what gets written')).toBeInTheDocument()
+
+    fireEvent.click(screen.getByText('Map code "YF" to...'))
+    fireEvent.click(await screen.findByText('Yellow fever'))
+
+    // The warning clears once a translation is picked.
+    await waitFor(() => expect(screen.queryByText('Not yet mapped -- omitted from what gets written')).not.toBeInTheDocument())
+
+    fireEvent.click(await screen.findByText('National level'))
+    fireEvent.click(screen.getByText('Write this event to DHIS2'))
+
+    expect(await screen.findByText('Event written')).toBeInTheDocument()
+    expect(trackerCalls).toEqual([
+        {
+            type: 'create',
+            data: {
+                events: [
+                    {
+                        program: 'prog1',
+                        programStage: 'stage1',
+                        orgUnit: 'orgUnit1',
+                        occurredAt: '2026-06-30T09:00:00+00:00',
+                        status: 'COMPLETED',
+                        // The real DHIS2 option code -- not "Yellow fever vaccine" display text.
+                        dataValues: [{ dataElement: 'de1', value: 'YELLOW_FEVER' }],
+                    },
+                ],
+            },
+        },
+    ])
 
     jest.restoreAllMocks()
 })

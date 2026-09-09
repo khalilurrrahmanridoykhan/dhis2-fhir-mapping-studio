@@ -9,15 +9,13 @@ import { formatFhirValue } from '../fhir/formatFhirValue'
  * "(no value)", so callers can omit the dataValue entirely rather than
  * writing that string into DHIS2.
  *
- * Known, deliberate limitation: for a CodeableConcept mapped onto an
- * OPTION_SET-typed data element, this writes the coding's display text
- * (or code, or free text) as-is -- it does NOT translate that into one of
- * the data element's own option codes. That translation is the
- * CodeableConcept-to-OPTION_SET code-mapping step from the design doc,
- * still unbuilt; until it exists, writing a coded field onto an
- * OPTION_SET data element may fail DHIS2's own validation, and that
- * failure is surfaced as a normal per-event error (see writeTrackerEvent.ts),
- * not silently swallowed.
+ * This function only ever sees the OPTION_SET-to-code translation problem
+ * secondhand: buildTrackerEventPayload calls resolveDataValue first,
+ * which handles a CodeableConcept mapped onto an OPTION_SET data element
+ * itself (writing the admin's saved translation, or omitting the value if
+ * none exists yet -- see resolveDataValue.ts) and only falls through to
+ * this function for every other case: a non-OPTION_SET data element, or a
+ * value that isn't CodeableConcept-shaped at all.
  */
 export function toDhisDataValue(rawValue: unknown): string | null {
   const formatted = formatFhirValue(rawValue)

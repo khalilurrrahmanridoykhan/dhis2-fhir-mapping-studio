@@ -35,11 +35,16 @@ All notable changes to this project are documented here. Format follows
   Tracker event, via `/api/tracker`. Shows the created event's real id on
   success, or DHIS2's own rejection message on failure.
 
-Known, deliberate limitations: one resource at a time (no multi-resource
-batch sync yet), and the CodeableConcept-to-OPTION_SET code-mapping step
-for coded fields is still unbuilt -- writing a coded field onto an
-OPTION_SET data element may be rejected by DHIS2 until that exists, and
-that rejection surfaces as a normal, visible error rather than silently.
+- Code mapping for coded fields (in Step 4): when a CodeableConcept-typed
+  IG field is mapped onto an OPTION_SET data element, the preview now
+  shows the real code observed on the fetched resource and lets an admin
+  pick which of the data element's own options it corresponds to, inline.
+  Step 5 writes that saved translation -- the real DHIS2 option code, not
+  display text -- and cleanly omits the field (rather than sending text
+  DHIS2 would reject) when no translation has been picked yet.
+
+Known, deliberate limitation: one resource at a time -- no multi-resource
+batch sync yet.
 
 ## [0.1.0] - 2026-09-08
 

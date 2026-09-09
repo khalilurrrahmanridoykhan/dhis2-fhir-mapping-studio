@@ -3,9 +3,11 @@ import type { DhisTargetProgram } from '../dhis2/types'
 import {
   clearFieldMapping,
   createEmptyMappingProfile,
+  dhisOptionCodeFor,
   fhirFieldMappedTo,
   isMappingComplete,
   missingRequiredFieldMappings,
+  setCodeMapping,
   setFieldMapping,
 } from './MappingProfile'
 
@@ -90,5 +92,44 @@ describe('missingRequiredFieldMappings / isMappingComplete', () => {
     let profile = createEmptyMappingProfile(program)
     profile = setFieldMapping(profile, 'de1', 'statusReason') // statusReason is 0..1, not required
     expect(isMappingComplete(profile, required)).toBe(false)
+  })
+})
+
+describe('setCodeMapping / dhisOptionCodeFor', () => {
+  it('records a code translation and reads it back', () => {
+    let profile = createEmptyMappingProfile(program)
+    profile = setFieldMapping(profile, 'de1', 'vaccineCode')
+    profile = setCodeMapping(profile, 'de1', 'YF', 'YELLOW_FEVER')
+    expect(dhisOptionCodeFor(profile, 'de1', 'YF')).toBe('YELLOW_FEVER')
+  })
+
+  it('re-mapping the same FHIR code replaces, not duplicates, its translation', () => {
+    let profile = createEmptyMappingProfile(program)
+    profile = setFieldMapping(profile, 'de1', 'vaccineCode')
+    profile = setCodeMapping(profile, 'de1', 'YF', 'YELLOW_FEVER')
+    profile = setCodeMapping(profile, 'de1', 'YF', 'CORRECTED_CODE')
+    expect(profile.fieldMappings[0].codeMappings).toHaveLength(1)
+    expect(dhisOptionCodeFor(profile, 'de1', 'YF')).toBe('CORRECTED_CODE')
+  })
+
+  it('different FHIR codes on the same field each keep their own translation', () => {
+    let profile = createEmptyMappingProfile(program)
+    profile = setFieldMapping(profile, 'de1', 'vaccineCode')
+    profile = setCodeMapping(profile, 'de1', 'YF', 'YELLOW_FEVER')
+    profile = setCodeMapping(profile, 'de1', 'MEASLES', 'MEASLES_VACCINE')
+    expect(dhisOptionCodeFor(profile, 'de1', 'YF')).toBe('YELLOW_FEVER')
+    expect(dhisOptionCodeFor(profile, 'de1', 'MEASLES')).toBe('MEASLES_VACCINE')
+  })
+
+  it('is a no-op when the data element has no field mapping to attach a code translation to', () => {
+    const profile = createEmptyMappingProfile(program)
+    const unchanged = setCodeMapping(profile, 'de1', 'YF', 'YELLOW_FEVER')
+    expect(unchanged).toBe(profile)
+  })
+
+  it('reading an unmapped code returns null, not undefined or a throw', () => {
+    let profile = createEmptyMappingProfile(program)
+    profile = setFieldMapping(profile, 'de1', 'vaccineCode')
+    expect(dhisOptionCodeFor(profile, 'de1', 'YF')).toBeNull()
   })
 })

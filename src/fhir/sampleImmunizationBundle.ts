@@ -19,6 +19,7 @@
  * relying on it for anything beyond building/testing this app's own UI.
  */
 import type { ImmunizationIgField } from './immunizationIgFields'
+import { readImmunizationField } from './readImmunizationField'
 
 export const sampleImmunizationResource = {
   resourceType: 'Immunization',
@@ -75,40 +76,12 @@ export const sampleImmunizationBundle = {
 }
 
 /**
- * Reads a value out of the sample resource for a given IG field's path --
- * the same lookup shape the real mapping-preview UI will need against a
- * live fetched resource later. Intentionally simple (no JSONPath library);
- * only needs to resolve the finite set of paths in immunizationIgFields.ts.
+ * Reads a value out of the sample resource for a given IG field's path.
+ * A thin wrapper over the generic readImmunizationField() -- which is what
+ * the real preview pipeline uses against a live fetched resource -- kept
+ * here so existing callers/tests don't need to pass the sample resource
+ * in themselves.
  */
 export function readSampleField(field: ImmunizationIgField): unknown {
-  const r = sampleImmunizationResource as Record<string, unknown>
-  switch (field.path) {
-    case 'status':
-      return r.status
-    case 'vaccineCode':
-      return r.vaccineCode
-    case 'patient':
-      return r.patient
-    case 'occurrenceDateTime':
-      return r.occurrenceDateTime
-    case 'statusReason':
-      return undefined // not present in this sample -- optional field
-    case 'protocolApplied':
-      return r.protocolApplied
-    case 'protocolApplied.series':
-      return (r.protocolApplied as Array<{ series?: string }>)?.[0]?.series
-    case 'protocolApplied.doseNumberString':
-      return (r.protocolApplied as Array<{ doseNumberString?: string }>)?.[0]?.doseNumberString
-    default:
-      if (field.origin === 'ig-extension' && field.extensionUrl) {
-        const bag =
-          field.path.startsWith('location.')
-            ? ((r.location as { extension?: Array<{ url: string }> })?.extension ?? [])
-            : field.path.startsWith('protocolApplied.')
-            ? ((r.protocolApplied as Array<{ extension?: Array<{ url: string }> }>)?.[0]?.extension ?? [])
-            : ((r.extension as Array<{ url: string }>) ?? [])
-        return bag.find((e) => e.url === field.extensionUrl)
-      }
-      return undefined
-  }
+  return readImmunizationField(sampleImmunizationResource as Record<string, unknown>, field)
 }

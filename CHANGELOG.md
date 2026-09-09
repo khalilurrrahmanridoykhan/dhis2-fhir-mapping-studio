@@ -24,9 +24,13 @@ All notable changes to this project are documented here. Format follows
   browser -- so credentials never touch the client. The chosen connection
   persists to `dataStore` and auto-loads on reopen.
 
-Not yet built: actually fetching a FHIR resource through the connected
-route, applying a saved Mapping Profile to it, previewing the result, and
-writing it into DHIS2 Tracker.
+- Preview a mapping against a real fetched resource (Step 4): fetch one
+  Immunization resource through the connected Route and see, for every
+  DHIS2 data element, exactly what value its mapped WHO SG IG field reads
+  from that resource -- before anything is ever written to DHIS2.
+
+Not yet built: actually writing the mapped result into DHIS2 Tracker, and
+the CodeableConcept-to-OPTION_SET code-mapping step for coded fields.
 
 ## [0.1.0] - 2026-09-08
 

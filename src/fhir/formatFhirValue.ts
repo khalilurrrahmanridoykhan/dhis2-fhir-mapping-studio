@@ -2,9 +2,9 @@
  * Turns a raw value read off a FHIR resource (a CodeableConcept, a
  * Reference, an extension wrapper, a plain primitive, ...) into a short
  * human-readable string for the mapping preview table. This is display
- * formatting only -- it never feeds back into what actually gets written
- * to DHIS2 (that's a separate, later concern; see the design doc's
- * CodeableConcept-to-OPTION_SET code-mapping step, still unbuilt).
+ * formatting only -- what actually gets written to DHIS2 goes through
+ * resolveDataValue (src/write/), which applies a saved code translation
+ * for OPTION_SET fields rather than this function's display text.
  */
 export function formatFhirValue(value: unknown): string {
   if (value === undefined || value === null) {

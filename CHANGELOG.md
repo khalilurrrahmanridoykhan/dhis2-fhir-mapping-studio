@@ -37,11 +37,29 @@ All notable changes to this project are documented here. Format follows
 
 - Code mapping for coded fields (in Step 4): when a CodeableConcept-typed
   IG field is mapped onto an OPTION_SET data element, the preview now
-  shows the real code observed on the fetched resource and lets an admin
-  pick which of the data element's own options it corresponds to, inline.
-  Step 5 writes that saved translation -- the real DHIS2 option code, not
-  display text -- and cleanly omits the field (rather than sending text
-  DHIS2 would reject) when no translation has been picked yet.
+  shows the real code (or text label) observed on the fetched resource
+  and lets an admin pick which of the data element's own options it
+  corresponds to, inline. Step 5 writes that saved translation -- the
+  real DHIS2 option code, not display text -- and cleanly omits the field
+  (rather than sending text DHIS2 would reject) when no translation has
+  been picked yet.
+
+### Verified against a real DHIS2 instance
+
+A live smoke test against `play.im.dhis2.org` and a real HAPI FHIR
+server confirmed the program-browse query, the route-list query, and the
+whole Tracker write contract (`status`, the created event id path,
+the validation-error shape, and that DHIS2 accepts FHIR's
+`occurrenceDateTime` format directly as `occurredAt`). It also drove
+three fixes:
+
+- Step 4 now warns, naming them, when a **compulsory** data element will
+  have no value -- rather than letting the write fail with a raw `E1303`.
+- Text-only `CodeableConcept` values (which real FHIR servers send for
+  `vaccineCode`) are now mappable, not silently written as raw text.
+- Confirmed the app correctly keys "is this a coded field" off the
+  `optionSet`'s presence, not the `valueType` string (a real instance
+  reports an option-set element as `valueType: "TEXT"`).
 
 Known, deliberate limitation: one resource at a time -- no multi-resource
 batch sync yet.

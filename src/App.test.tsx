@@ -142,7 +142,7 @@ it('picking a route in Step 1 persists the connection', async () => {
     expect(connectionCalls).toEqual(['read', 'create'])
 })
 
-it('Step 3 asks to connect a FHIR server first when no route is picked yet', async () => {
+it('Step 4 asks to connect a FHIR server first, and hides the fetch action, when no route is picked yet', async () => {
     render(
         <CustomDataProvider data={mockProgramsData}>
             <App />
@@ -153,7 +153,8 @@ it('Step 3 asks to connect a FHIR server first when no route is picked yet', asy
     fireEvent.click(await screen.findByText('Immunization program'))
 
     expect(await screen.findByText('Connect a FHIR server in Step 1 to preview this mapping')).toBeInTheDocument()
-    expect(screen.queryByText('Step 4: preview against a real fetched resource')).not.toBeInTheDocument()
+    // The step heading still shows, but the preview action does not.
+    expect(screen.queryByText('Fetch a resource and preview the mapping')).not.toBeInTheDocument()
 })
 
 it('with a route already connected, Step 4 fetches a real resource and previews the mapping', async () => {

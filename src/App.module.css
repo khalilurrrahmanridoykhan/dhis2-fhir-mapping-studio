@@ -1,9 +1,57 @@
-.container {
-  width: 100%;
-  height: 100%;
+/* Greys below are DHIS2 design tokens (grey900 #212934, grey700 #4a5768,
+   grey300 #d5dde5), used directly since @dhis2/ui exposes them as JS
+   constants, not CSS variables. */
+.page {
+  box-sizing: border-box;
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 16px;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: 1rem;
+  gap: 16px;
+}
+
+.intro {
+  margin: 0;
+  font-size: 14px;
+  line-height: 20px;
+  color: #4a5768;
+}
+
+.card {
+  box-sizing: border-box;
+  padding: 16px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.stepHeading {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 500;
+  color: #212934;
+}
+
+.hint {
+  margin: 0;
+  font-size: 13px;
+  line-height: 19px;
+  color: #4a5768;
+}
+
+.hint code {
+  font-size: 12px;
+}
+
+.missingBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.missingFields {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
 }

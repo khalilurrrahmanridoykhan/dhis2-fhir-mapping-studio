@@ -9,10 +9,14 @@ import type { DhisTargetProgram } from './types'
  * DHIS2 side is per-deployment and has to be picked by a human, not
  * inferred).
  *
- * Query shape verified live against play.im.dhis2.org/stable-2-43-1
- * before being written here -- confirmed programs, programStages, and
- * per-stage dataElement (id/name/valueType/optionSet) all resolve exactly
- * as nested below, not assumed from documentation.
+ * Query shape verified live against play.im.dhis2.org/stable-2-43-1 --
+ * confirmed programs, programStages, and per-stage
+ * dataElement (id/name/valueType/optionSet) plus the per-stage
+ * `compulsory` flag all resolve exactly as nested below. A live smoke
+ * test also turned up that an OPTION_SET-typed data element reports
+ * valueType 'TEXT' with a non-null optionSet on that instance -- so the
+ * optionSet's presence, not the valueType string, is what tells this app
+ * a field is coded (see resolveDataValue.ts / buildMappingPreview.ts).
  */
 interface TargetProgramsQueryResult {
   programs: {
@@ -27,7 +31,7 @@ const query = {
       filter: 'programType:eq:WITHOUT_REGISTRATION',
       fields: [
         'id,name',
-        'programStages[id,name,programStageDataElements[dataElement[id,name,valueType,optionSet[id,name,options[code,name]]]]]',
+        'programStages[id,name,programStageDataElements[compulsory,dataElement[id,name,valueType,optionSet[id,name,options[code,name]]]]]',
       ].join(','),
       pageSize: 100,
     },

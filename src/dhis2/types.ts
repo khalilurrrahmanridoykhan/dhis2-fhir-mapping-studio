@@ -25,6 +25,14 @@ export interface DhisDataElement {
 
 export interface DhisProgramStageDataElement {
   dataElement: DhisDataElement
+  /**
+   * When true, DHIS2 rejects an event that carries no value for this data
+   * element (error E1303) -- confirmed live against a real instance. This
+   * app can't fill a compulsory element the mapping/resource doesn't
+   * provide a value for, so it warns rather than letting the write fail
+   * with a message an admin would have to decode.
+   */
+  compulsory: boolean
 }
 
 export interface DhisProgramStage {

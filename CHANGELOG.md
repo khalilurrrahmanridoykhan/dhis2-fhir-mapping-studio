@@ -44,6 +44,21 @@ All notable changes to this project are documented here. Format follows
   (rather than sending text DHIS2 would reject) when no translation has
   been picked yet.
 
+### App Hub readiness
+
+- App laid out as `@dhis2/ui` cards with consistent spacing; a one-line
+  description, a custom app icon, and manifest metadata (title,
+  description, author, `dataStoreNamespace`).
+- Wrapped in an `ErrorBoundary` -- a render error shows a `NoticeBox`, not
+  a blank screen.
+- `SECURITY.md`: the app's own code is clean; all `npm audit` advisories
+  are transitive through `@dhis2/ui` / `@dhis2/cli-app-scripts`.
+- `i18n`: every string uses `i18n.t()` with no colons (they broke the
+  extractor's key parsing); `en.pot` regenerates clean and matches the
+  source.
+- CI now also runs `tsc --noEmit`; build tooling pinned to a stable
+  release.
+
 ### Verified against a real DHIS2 instance
 
 Every HTTP contract this app depends on has been exercised against a real

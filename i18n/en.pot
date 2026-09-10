@@ -5,17 +5,48 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2026-09-08T10:53:25.674Z\n"
-"PO-Revision-Date: 2026-09-08T10:53:25.674Z\n"
+"POT-Creation-Date: 2026-09-10T06:26:38.817Z\n"
+"PO-Revision-Date: 2026-09-10T06:26:38.817Z\n"
 
-msgid "FHIR Mapping Studio"
-msgstr "FHIR Mapping Studio"
+msgid ""
+"Map a FHIR Immunization resource -- against the WHO SMART Guidelines "
+"Immunization IG -- onto this instance's own programme, fetch a real "
+"resource through a DHIS2 Route, preview exactly what the mapping produces, "
+"and write it into Tracker."
+msgstr ""
+"Map a FHIR Immunization resource -- against the WHO SMART Guidelines "
+"Immunization IG -- onto this instance's own programme, fetch a real "
+"resource through a DHIS2 Route, preview exactly what the mapping produces, "
+"and write it into Tracker."
+
+msgid "Step 1 -- connect to a FHIR server"
+msgstr "Step 1 -- connect to a FHIR server"
+
+msgid "Selected route target --"
+msgstr "Selected route target --"
+
+msgid "Could not load the saved connection"
+msgstr "Could not load the saved connection"
+
+msgid "Could not save this connection"
+msgstr "Could not save this connection"
+
+msgid "Step 2 -- pick the DHIS2 program to map onto"
+msgstr "Step 2 -- pick the DHIS2 program to map onto"
 
 msgid "Could not load a saved mapping for this program"
 msgstr "Could not load a saved mapping for this program"
 
-msgid "Every required IG field is mapped."
-msgstr "Every required IG field is mapped."
+msgid "Step 3 -- map its data elements to the WHO SG Immunization IG"
+msgstr "Step 3 -- map its data elements to the WHO SG Immunization IG"
+
+msgid "Every required IG field is mapped"
+msgstr "Every required IG field is mapped"
+
+msgid "{{count}} required IG field(s) still unmapped"
+msgid_plural "{{count}} required IG field(s) still unmapped"
+msgstr[0] "{{count}} required IG field(s) still unmapped"
+msgstr[1] "{{count}} required IG field(s) still unmapped"
 
 msgid "Save mapping"
 msgstr "Save mapping"
@@ -29,6 +60,27 @@ msgstr "This mapping is saved and will load automatically next time."
 msgid "Could not save this mapping"
 msgstr "Could not save this mapping"
 
+msgid "Step 4 -- preview against a real fetched resource"
+msgstr "Step 4 -- preview against a real fetched resource"
+
+msgid "Connect a FHIR server in Step 1 to preview this mapping"
+msgstr "Connect a FHIR server in Step 1 to preview this mapping"
+
+msgid "Previewing needs a real resource fetched through a connected Route."
+msgstr "Previewing needs a real resource fetched through a connected Route."
+
+msgid "Step 5 -- write this event to DHIS2"
+msgstr "Step 5 -- write this event to DHIS2"
+
+msgid "Could not load organisation units"
+msgstr "Could not load organisation units"
+
+msgid "No organisation units found"
+msgstr "No organisation units found"
+
+msgid "This instance has no organisation units to select."
+msgstr "This instance has no organisation units to select."
+
 msgid "Could not load programs"
 msgstr "Could not load programs"
 
@@ -38,8 +90,145 @@ msgstr "No eligible programs found"
 msgid "Select a target program"
 msgstr "Select a target program"
 
+msgid "Could not load routes"
+msgstr "Could not load routes"
+
+msgid "Select a route to a FHIR server"
+msgstr "Select a route to a FHIR server"
+
+msgid "No routes to a FHIR server found yet"
+msgstr "No routes to a FHIR server found yet"
+
+msgid "Set one up in the Route Manager app, or create one here."
+msgstr "Set one up in the Route Manager app, or create one here."
+
+msgid "Open Route Manager"
+msgstr "Open Route Manager"
+
+msgid "Cancel"
+msgstr "Cancel"
+
+msgid "Create a route here"
+msgstr "Create a route here"
+
+msgid "You may not have permission to create a route"
+msgstr "You may not have permission to create a route"
+
+msgid ""
+"Creating a route needs the Route-create authority (or a superuser role). "
+"Ask your DHIS2 administrator, or use Route Manager if you already have "
+"access there."
+msgstr ""
+"Creating a route needs the Route-create authority (or a superuser role). "
+"Ask your DHIS2 administrator, or use Route Manager if you already have "
+"access there."
+
+msgid "Name and FHIR base URL are required."
+msgstr "Name and FHIR base URL are required."
+
+msgid "Could not create route"
+msgstr "Could not create route"
+
+msgid "Route name"
+msgstr "Route name"
+
+msgid "e.g. Clinic FHIR server"
+msgstr "e.g. Clinic FHIR server"
+
+msgid "FHIR base URL"
+msgstr "FHIR base URL"
+
+msgid "e.g."
+msgstr "e.g."
+
+msgid ""
+"A \"/**\" wildcard suffix is added automatically -- required to proxy a "
+"paginated FHIR API through this route."
+msgstr ""
+"A \"/**\" wildcard suffix is added automatically -- required to proxy a "
+"paginated FHIR API through this route."
+
+msgid "Response timeout (seconds)"
+msgstr "Response timeout (seconds)"
+
+msgid "Authentication"
+msgstr "Authentication"
+
+msgid "None (public server)"
+msgstr "None (public server)"
+
+msgid "Basic auth (username/password)"
+msgstr "Basic auth (username/password)"
+
+msgid "Bearer token (incl. SMART on FHIR static token)"
+msgstr "Bearer token (incl. SMART on FHIR static token)"
+
+msgid "API token"
+msgstr "API token"
+
+msgid "Username"
+msgstr "Username"
+
+msgid "Password"
+msgstr "Password"
+
+msgid "Bearer token"
+msgstr "Bearer token"
+
+msgid ""
+"Sent as an Authorization header, \"Bearer <token>\". Not auto-refreshed -- "
+"rotate manually if it expires."
+msgstr ""
+"Sent as an Authorization header, \"Bearer <token>\". Not auto-refreshed -- "
+"rotate manually if it expires."
+
+msgid "Create route"
+msgstr "Create route"
+
+msgid "Fetch a resource and preview the mapping"
+msgstr "Fetch a resource and preview the mapping"
+
+msgid "Could not fetch a preview"
+msgstr "Could not fetch a preview"
+
+msgid "No resources found"
+msgstr "No resources found"
+
+msgid "The connected FHIR server returned no Immunization resources to preview."
+msgstr "The connected FHIR server returned no Immunization resources to preview."
+
+msgid "DHIS2 will reject this write -- compulsory data elements have no value"
+msgstr "DHIS2 will reject this write -- compulsory data elements have no value"
+
+msgid ""
+"This program stage requires a value for {{names}}, but the mapping produces "
+"none for them. Map each to an IG field the fetched resource provides (and, "
+"for coded fields, map its code), or the write fails."
+msgstr ""
+"This program stage requires a value for {{names}}, but the mapping produces "
+"none for them. Map each to an IG field the fetched resource provides (and, "
+"for coded fields, map its code), or the write fails."
+
 msgid "DHIS2 data element"
 msgstr "DHIS2 data element"
+
+msgid "Mapped WHO SG IG field"
+msgstr "Mapped WHO SG IG field"
+
+msgid "Value from the fetched resource"
+msgstr "Value from the fetched resource"
+
+msgid "Code mapping"
+msgstr "Code mapping"
+
+msgid "Not mapped"
+msgstr "Not mapped"
+
+msgid "Map code \"{{code}}\" to..."
+msgstr "Map code \"{{code}}\" to..."
+
+msgid "Not yet mapped -- omitted from what gets written"
+msgstr "Not yet mapped -- omitted from what gets written"
 
 msgid "Value type"
 msgstr "Value type"
@@ -47,22 +236,30 @@ msgstr "Value type"
 msgid "WHO SG Immunization IG field"
 msgstr "WHO SG Immunization IG field"
 
-msgid "Not mapped"
-msgstr "Not mapped"
-
 msgid "required"
 msgstr "required"
+
+msgid "FHIR Mapping Studio hit an unexpected error"
+msgstr "FHIR Mapping Studio hit an unexpected error"
+
+msgid "Write this event to DHIS2"
+msgstr "Write this event to DHIS2"
+
+msgid "Could not build this event"
+msgstr "Could not build this event"
+
+msgid "Event written"
+msgstr "Event written"
+
+msgid "Created event {{eventId}} in DHIS2."
+msgstr "Created event {{eventId}} in DHIS2."
+
+msgid "DHIS2 rejected this event"
+msgstr "DHIS2 rejected this event"
+
+msgid "No further detail was reported."
+msgstr "No further detail was reported."
 
 msgctxt "REGISTRATION programs to map onto yet."
 msgid "This instance has no WITHOUT"
 msgstr "This instance has no WITHOUT_REGISTRATION programs to map onto yet."
-
-msgctxt "Application title"
-msgid "__MANIFEST_APP_TITLE"
-msgstr "dhis2-fhir-mapping-studio"
-
-msgctxt "Application description"
-msgid "__MANIFEST_APP_DESCRIPTION"
-msgstr ""
-"DHIS2-side FHIR mapping authoring tool, anchored on the WHO SMART "
-"Guidelines Immunization IG."

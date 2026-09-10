@@ -15,6 +15,7 @@ import { useFhirConnection } from './fhirConnection/useFhirConnection'
 import { useFhirRoute } from './fhirConnection/useFhirRoute'
 import { WriteToTracker } from './write/WriteToTracker'
 import { useWriteMappedEvent } from './write/useWriteMappedEvent'
+import { ErrorBoundary } from './shared/ErrorBoundary'
 import classes from './App.module.css'
 
 // Five steps: connect (Step 1), pick a program (Step 2), map its fields
@@ -28,7 +29,7 @@ import classes from './App.module.css'
 //
 // Still unbuilt: multi-resource batch sync -- Step 4/5 only ever handle
 // one resource at a time.
-const App: FC = () => {
+const AppContent: FC = () => {
     const [selectedProgram, setSelectedProgram] = useState<DhisTargetProgram | null>(null)
     const { profile, setProfile, loading, loadError, saving, saveError, savedRecently, save } = useMappingProfile(selectedProgram)
 
@@ -51,7 +52,7 @@ const App: FC = () => {
             </p>
 
             <Card className={classes.card}>
-                <h2 className={classes.stepHeading}>{i18n.t('Step 1: connect to a FHIR server')}</h2>
+                <h2 className={classes.stepHeading}>{i18n.t('Step 1 -- connect to a FHIR server')}</h2>
                 {connection.loading ? (
                     <CircularLoader small />
                 ) : (
@@ -64,7 +65,7 @@ const App: FC = () => {
                 )}
                 {selectedRoute && (
                     <p className={classes.hint}>
-                        {i18n.t('Selected route target:')} <code>{selectedRoute.url}</code>
+                        {i18n.t('Selected route target --')} <code>{selectedRoute.url}</code>
                     </p>
                 )}
                 {connection.loadError && (
@@ -80,7 +81,7 @@ const App: FC = () => {
             </Card>
 
             <Card className={classes.card}>
-                <h2 className={classes.stepHeading}>{i18n.t('Step 2: pick the DHIS2 program to map onto')}</h2>
+                <h2 className={classes.stepHeading}>{i18n.t('Step 2 -- pick the DHIS2 program to map onto')}</h2>
                 <ProgramPicker selectedProgramId={selectedProgram?.id ?? null} onSelect={setSelectedProgram} />
                 {loading && <CircularLoader small />}
                 {loadError && (
@@ -94,7 +95,7 @@ const App: FC = () => {
                 <>
                     <Card className={classes.card}>
                         <h2 className={classes.stepHeading}>
-                            {i18n.t('Step 3: map its data elements to the WHO SG Immunization IG')}
+                            {i18n.t('Step 3 -- map its data elements to the WHO SG Immunization IG')}
                         </h2>
                         <MappingTable program={selectedProgram} profile={profile} onChange={setProfile} />
 
@@ -132,7 +133,7 @@ const App: FC = () => {
                     </Card>
 
                     <Card className={classes.card}>
-                        <h2 className={classes.stepHeading}>{i18n.t('Step 4: preview against a real fetched resource')}</h2>
+                        <h2 className={classes.stepHeading}>{i18n.t('Step 4 -- preview against a real fetched resource')}</h2>
                         {connection.routeId ? (
                             <MappingPreview
                                 preview={preview}
@@ -149,7 +150,7 @@ const App: FC = () => {
 
                     {preview.resource && (
                         <Card className={classes.card}>
-                            <h2 className={classes.stepHeading}>{i18n.t('Step 5: write this event to DHIS2')}</h2>
+                            <h2 className={classes.stepHeading}>{i18n.t('Step 5 -- write this event to DHIS2')}</h2>
                             <WriteToTracker write={write} />
                         </Card>
                     )}
@@ -158,5 +159,11 @@ const App: FC = () => {
         </div>
     )
 }
+
+const App: FC = () => (
+    <ErrorBoundary>
+        <AppContent />
+    </ErrorBoundary>
+)
 
 export default App

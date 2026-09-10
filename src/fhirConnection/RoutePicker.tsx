@@ -148,7 +148,7 @@ const CreateRouteForm: FC<CreateRouteFormProps> = ({ fhirRoute, onCreated }) => 
         label={i18n.t('FHIR base URL')}
         value={baseUrl}
         onChange={({ value }) => setBaseUrl(value ?? '')}
-        placeholder={i18n.t('e.g. https://hapi.fhir.org/baseR4')}
+        placeholder={`${i18n.t('e.g.')} https://hapi.fhir.org/baseR4`}
         helpText={i18n.t(
           'A "/**" wildcard suffix is added automatically -- required to proxy a paginated FHIR API through this route.'
         )}
@@ -197,7 +197,7 @@ const CreateRouteForm: FC<CreateRouteFormProps> = ({ fhirRoute, onCreated }) => 
           onChange={({ value }) => setToken(value ?? '')}
           helpText={
             authType === 'api-headers'
-              ? i18n.t('Sent as "Authorization: Bearer <token>". Not auto-refreshed -- rotate manually if it expires.')
+              ? i18n.t('Sent as an Authorization header, "Bearer <token>". Not auto-refreshed -- rotate manually if it expires.')
               : undefined
           }
         />

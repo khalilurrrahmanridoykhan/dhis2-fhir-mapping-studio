@@ -65,7 +65,7 @@ export const MappingPreview: FC<MappingPreviewProps> = ({ preview, onCodeMapping
       {compulsoryGaps.length > 0 && (
         <NoticeBox warning title={i18n.t('DHIS2 will reject this write -- compulsory data elements have no value')}>
           {i18n.t(
-            'This program stage requires a value for: {{names}}. Map each to an IG field the fetched resource actually provides (and, for coded fields, map its code), or the write fails.',
+            'This program stage requires a value for {{names}}, but the mapping produces none for them. Map each to an IG field the fetched resource provides (and, for coded fields, map its code), or the write fails.',
             { names: compulsoryGaps.map((row) => row.dhisDataElementName).join(', ') }
           )}
         </NoticeBox>

@@ -77,7 +77,7 @@ it('selecting a program reveals step 3, the mapping table, with an unmapped-requ
     fireEvent.click(await screen.findByText('Select a target program'))
     fireEvent.click(await screen.findByText('Immunization program'))
 
-    expect(await screen.findByText('Step 3: map its data elements to the WHO SG Immunization IG')).toBeInTheDocument()
+    expect(await screen.findByText('Step 3 -- map its data elements to the WHO SG Immunization IG')).toBeInTheDocument()
     expect(screen.getByText('Vaccine given')).toBeInTheDocument()
     // Nothing mapped yet -- every required IG field should be reported
     // missing. Read the real count from immunizationIgFields.ts itself
@@ -107,7 +107,7 @@ it('clicking Save persists the current mapping and shows a saved confirmation', 
 
     fireEvent.click(await screen.findByText('Select a target program'))
     fireEvent.click(await screen.findByText('Immunization program'))
-    await screen.findByText('Step 3: map its data elements to the WHO SG Immunization IG')
+    await screen.findByText('Step 3 -- map its data elements to the WHO SG Immunization IG')
 
     fireEvent.click(screen.getByText('Save mapping'))
 
@@ -183,7 +183,7 @@ it('with a route already connected, Step 4 fetches a real resource and previews 
     fireEvent.click(await screen.findByText('Select a target program'))
     fireEvent.click(await screen.findByText('Immunization program'))
 
-    expect(await screen.findByText('Step 4: preview against a real fetched resource')).toBeInTheDocument()
+    expect(await screen.findByText('Step 4 -- preview against a real fetched resource')).toBeInTheDocument()
 
     fireEvent.click(screen.getByText('Fetch a resource and preview the mapping'))
 
@@ -274,7 +274,7 @@ it('Step 4 lets an admin map an observed FHIR code to a DHIS2 option, and Step 5
 
     fireEvent.click(await screen.findByText('Select a target program'))
     fireEvent.click(await screen.findByText('Immunization program'))
-    await screen.findByText('Step 4: preview against a real fetched resource')
+    await screen.findByText('Step 4 -- preview against a real fetched resource')
 
     fireEvent.click(screen.getByText('Fetch a resource and preview the mapping'))
 
@@ -350,13 +350,13 @@ it('Step 5 appears only once a preview has been fetched, then writes exactly tha
 
     fireEvent.click(await screen.findByText('Select a target program'))
     fireEvent.click(await screen.findByText('Immunization program'))
-    expect(screen.queryByText('Step 5: write this event to DHIS2')).not.toBeInTheDocument()
+    expect(screen.queryByText('Step 5 -- write this event to DHIS2')).not.toBeInTheDocument()
 
-    await screen.findByText('Step 4: preview against a real fetched resource')
+    await screen.findByText('Step 4 -- preview against a real fetched resource')
     fireEvent.click(screen.getByText('Fetch a resource and preview the mapping'))
     await screen.findByText('Not mapped')
 
-    expect(await screen.findByText('Step 5: write this event to DHIS2')).toBeInTheDocument()
+    expect(await screen.findByText('Step 5 -- write this event to DHIS2')).toBeInTheDocument()
 
     fireEvent.click(await screen.findByText('National level'))
     fireEvent.click(screen.getByText('Write this event to DHIS2'))

@@ -81,6 +81,33 @@ describe('MappingPreview', () => {
     expect(screen.queryByRole('table')).not.toBeInTheDocument()
   })
 
+  it('warns, naming them, when compulsory data elements will have no value in the written event', () => {
+    renderPreview(
+      makePreview({
+        resourceCount: 1,
+        rows: [
+          { dhisDataElementId: 'de1', dhisDataElementName: 'IC Activity', fhirFieldPath: null, fhirFieldLabel: null, displayValue: 'Not mapped', codeMapping: null, compulsory: true, willBeWritten: false },
+          { dhisDataElementId: 'de2', dhisDataElementName: 'IC Topic', fhirFieldPath: 'statusReason', fhirFieldLabel: 'Status reason', displayValue: '(no value)', codeMapping: null, compulsory: true, willBeWritten: false },
+          { dhisDataElementId: 'de3', dhisDataElementName: 'Status', fhirFieldPath: 'status', fhirFieldLabel: 'Status', displayValue: 'completed', codeMapping: null, compulsory: false, willBeWritten: true },
+        ],
+      })
+    )
+    expect(screen.getByText('DHIS2 will reject this write -- compulsory data elements have no value')).toBeInTheDocument()
+    expect(screen.getByText(/IC Activity, IC Topic/)).toBeInTheDocument()
+  })
+
+  it('shows no compulsory warning when every compulsory row will be written', () => {
+    renderPreview(
+      makePreview({
+        resourceCount: 1,
+        rows: [
+          { dhisDataElementId: 'de1', dhisDataElementName: 'Status', fhirFieldPath: 'status', fhirFieldLabel: 'Status', displayValue: 'completed', codeMapping: null, compulsory: true, willBeWritten: true },
+        ],
+      })
+    )
+    expect(screen.queryByText('DHIS2 will reject this write -- compulsory data elements have no value')).not.toBeInTheDocument()
+  })
+
   describe('code mapping', () => {
     function rowWith(overrides: { resolvedOptionCode: string | null }) {
       return {

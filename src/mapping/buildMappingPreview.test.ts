@@ -10,9 +10,9 @@ const program: DhisTargetProgram = {
       id: 'stage1',
       name: 'Immunization stage',
       programStageDataElements: [
-        { dataElement: { id: 'de-status', name: 'Vaccination status', valueType: 'TEXT' } },
-        { dataElement: { id: 'de-vaccine', name: 'Vaccine given', valueType: 'TEXT' } },
-        { dataElement: { id: 'de-unmapped', name: 'Unrelated field', valueType: 'TEXT' } },
+        { compulsory: false, dataElement: { id: 'de-status', name: 'Vaccination status', valueType: 'TEXT' } },
+        { compulsory: true, dataElement: { id: 'de-vaccine', name: 'Vaccine given', valueType: 'TEXT' } },
+        { compulsory: false, dataElement: { id: 'de-unmapped', name: 'Unrelated field', valueType: 'TEXT' } },
       ],
     },
   ],
@@ -66,6 +66,23 @@ describe('buildMappingPreview', () => {
     const rows = buildMappingPreview(program, emptyProfile, fetchedResource)
     expect(rows.every((r) => r.codeMapping === null)).toBe(true)
   })
+
+  it('carries the compulsory flag and whether each row will actually be written', () => {
+    let profile = setFieldMapping(emptyProfile, 'de-status', 'status')
+    profile = setFieldMapping(profile, 'de-vaccine', 'statusReason') // compulsory DE, mapped to a field the resource lacks
+    const rows = buildMappingPreview(program, profile, fetchedResource)
+
+    const status = rows.find((r) => r.dhisDataElementId === 'de-status')
+    expect(status).toMatchObject({ compulsory: false, willBeWritten: true })
+
+    // Compulsory, mapped, but the resource has no statusReason -> this
+    // write WILL be rejected by DHIS2, and the row says so.
+    const vaccine = rows.find((r) => r.dhisDataElementId === 'de-vaccine')
+    expect(vaccine).toMatchObject({ compulsory: true, willBeWritten: false })
+
+    const unmapped = rows.find((r) => r.dhisDataElementId === 'de-unmapped')
+    expect(unmapped).toMatchObject({ compulsory: false, willBeWritten: false })
+  })
 })
 
 describe('buildMappingPreview -- code mapping', () => {
@@ -86,7 +103,7 @@ describe('buildMappingPreview -- code mapping', () => {
         id: 'stage1',
         name: 'Immunization stage',
         programStageDataElements: [
-          { dataElement: { id: 'de-vaccine', name: 'Vaccine given', valueType: 'OPTION_SET', optionSet: vaccineOptionSet } },
+          { compulsory: true, dataElement: { id: 'de-vaccine', name: 'Vaccine given', valueType: 'OPTION_SET', optionSet: vaccineOptionSet } },
         ],
       },
     ],
@@ -112,6 +129,14 @@ describe('buildMappingPreview -- code mapping', () => {
 
     const rows = buildMappingPreview(optionSetProgram, profile, fetchedResource)
     expect(rows[0].codeMapping?.resolvedOptionCode).toBe('YELLOW_FEVER')
+  })
+
+  it('willBeWritten tracks whether the observed code has a translation yet', () => {
+    let profile = setFieldMapping(emptyOptionSetProfile, 'de-vaccine', 'vaccineCode')
+    expect(buildMappingPreview(optionSetProgram, profile, fetchedResource)[0].willBeWritten).toBe(false)
+
+    profile = setCodeMapping(profile, 'de-vaccine', 'YF', 'YELLOW_FEVER')
+    expect(buildMappingPreview(optionSetProgram, profile, fetchedResource)[0].willBeWritten).toBe(true)
   })
 
   it('is null when the OPTION_SET data element is mapped to a non-coded field (e.g. status)', () => {

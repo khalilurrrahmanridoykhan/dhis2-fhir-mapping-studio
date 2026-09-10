@@ -51,7 +51,16 @@ describe('useMappingPreview', () => {
     expect(mockFetchImmunizationPreview).toHaveBeenCalledWith('route1', 1)
     expect(result.current.resourceCount).toBe(1)
     expect(result.current.rows).toEqual([
-      { dhisDataElementId: 'de-status', dhisDataElementName: 'Vaccination status', fhirFieldPath: 'status', fhirFieldLabel: 'Status', displayValue: 'completed', codeMapping: null },
+      {
+        dhisDataElementId: 'de-status',
+        dhisDataElementName: 'Vaccination status',
+        fhirFieldPath: 'status',
+        fhirFieldLabel: 'Status',
+        displayValue: 'completed',
+        codeMapping: null,
+        compulsory: false,
+        willBeWritten: true,
+      },
     ])
     // Exposed so a later write step submits exactly what was previewed.
     expect(result.current.resource).toEqual({ resourceType: 'Immunization', id: 'i1', status: 'completed' })

@@ -27,6 +27,17 @@ export interface MappingPreviewRow {
    * extractCodeableConcept.ts's own header comment for why).
    */
   codeMapping: MappingPreviewRowCodeMapping | null
+  /** DHIS2 rejects an event with no value for a compulsory data element (E1303). */
+  compulsory: boolean
+  /**
+   * Whether this row actually produces a dataValue in the written event --
+   * false for an unmapped element, a mapped element the resource has no
+   * value for, or an OPTION_SET element whose observed code isn't mapped
+   * to an option yet. Mirrors resolveDataValue's own outcome, so a
+   * compulsory row with willBeWritten false is a write that WILL be
+   * rejected.
+   */
+  willBeWritten: boolean
 }
 
 /**
@@ -54,9 +65,9 @@ export function buildMappingPreview(
   profile: MappingProfile,
   resource: Record<string, unknown>
 ): MappingPreviewRow[] {
-  const dataElements = program.programStages[0]?.programStageDataElements.map((d) => d.dataElement) ?? []
+  const stageDataElements = program.programStages[0]?.programStageDataElements ?? []
 
-  return dataElements.map((dataElement) => {
+  return stageDataElements.map(({ dataElement, compulsory }) => {
     const fhirFieldPath = fhirFieldMappedTo(profile, dataElement.id)
     if (!fhirFieldPath) {
       return {
@@ -66,11 +77,14 @@ export function buildMappingPreview(
         fhirFieldLabel: null,
         displayValue: 'Not mapped',
         codeMapping: null,
+        compulsory: Boolean(compulsory),
+        willBeWritten: false,
       }
     }
 
     const field = immunizationIgFields.find((f) => f.path === fhirFieldPath)
     const rawValue = field ? readImmunizationField(resource, field) : undefined
+    const displayValue = formatFhirValue(rawValue)
 
     let codeMapping: MappingPreviewRowCodeMapping | null = null
     if (dataElement.optionSet) {
@@ -86,13 +100,17 @@ export function buildMappingPreview(
       }
     }
 
+    const willBeWritten = codeMapping ? codeMapping.resolvedOptionCode !== null : displayValue !== '(no value)'
+
     return {
       dhisDataElementId: dataElement.id,
       dhisDataElementName: dataElement.name,
       fhirFieldPath,
       fhirFieldLabel: field?.label ?? fhirFieldPath,
-      displayValue: formatFhirValue(rawValue),
+      displayValue,
       codeMapping,
+      compulsory: Boolean(compulsory),
+      willBeWritten,
     }
   })
 }

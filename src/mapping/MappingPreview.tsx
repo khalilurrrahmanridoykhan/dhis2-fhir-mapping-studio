@@ -36,6 +36,8 @@ interface MappingPreviewProps {
  * profile; resolveDataValue.ts is what actually applies it at write time.
  */
 export const MappingPreview: FC<MappingPreviewProps> = ({ preview, onCodeMappingChange }) => {
+  const compulsoryGaps = (preview.rows ?? []).filter((row) => row.compulsory && !row.willBeWritten)
+
   return (
     <div>
       <Button small loading={preview.loading} onClick={() => preview.fetchPreview()}>
@@ -53,6 +55,15 @@ export const MappingPreview: FC<MappingPreviewProps> = ({ preview, onCodeMapping
       {preview.rows && preview.resourceCount === 0 && (
         <NoticeBox title={i18n.t('No resources found')}>
           {i18n.t('The connected FHIR server returned no Immunization resources to preview.')}
+        </NoticeBox>
+      )}
+
+      {compulsoryGaps.length > 0 && (
+        <NoticeBox warning title={i18n.t('DHIS2 will reject this write -- compulsory data elements have no value')}>
+          {i18n.t(
+            'This program stage requires a value for: {{names}}. Map each to an IG field the fetched resource actually provides (and, for coded fields, map its code), or the write fails.',
+            { names: compulsoryGaps.map((row) => row.dhisDataElementName).join(', ') }
+          )}
         </NoticeBox>
       )}
 

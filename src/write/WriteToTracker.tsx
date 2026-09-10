@@ -3,6 +3,7 @@ import i18n from '@dhis2/d2-i18n'
 import React, { FC } from 'react'
 import { OrgUnitPicker } from '../dhis2/OrgUnitPicker'
 import type { useWriteMappedEvent } from './useWriteMappedEvent'
+import classes from './WriteToTracker.module.css'
 
 interface WriteToTrackerProps {
   write: ReturnType<typeof useWriteMappedEvent>
@@ -17,12 +18,14 @@ interface WriteToTrackerProps {
  */
 export const WriteToTracker: FC<WriteToTrackerProps> = ({ write }) => {
   return (
-    <div>
+    <div className={classes.stack}>
       <OrgUnitPicker onSelect={write.setOrgUnitId} />
 
-      <Button primary small disabled={!write.canWrite} loading={write.writing} onClick={() => write.write()}>
-        {i18n.t('Write this event to DHIS2')}
-      </Button>
+      <div>
+        <Button primary disabled={!write.canWrite} loading={write.writing} onClick={() => write.write()}>
+          {i18n.t('Write this event to DHIS2')}
+        </Button>
+      </div>
 
       {write.buildError && (
         <NoticeBox error title={i18n.t('Could not build this event')}>

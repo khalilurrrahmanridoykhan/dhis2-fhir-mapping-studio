@@ -1,6 +1,7 @@
 import {
   Button,
   CircularLoader,
+  Help,
   NoticeBox,
   SingleSelect,
   SingleSelectOption,
@@ -15,6 +16,7 @@ import {
 import i18n from '@dhis2/d2-i18n'
 import React, { FC } from 'react'
 import type { useMappingPreview } from './useMappingPreview'
+import classes from './MappingPreview.module.css'
 
 interface MappingPreviewProps {
   preview: ReturnType<typeof useMappingPreview>
@@ -39,10 +41,12 @@ export const MappingPreview: FC<MappingPreviewProps> = ({ preview, onCodeMapping
   const compulsoryGaps = (preview.rows ?? []).filter((row) => row.compulsory && !row.willBeWritten)
 
   return (
-    <div>
-      <Button small loading={preview.loading} onClick={() => preview.fetchPreview()}>
-        {i18n.t('Fetch a resource and preview the mapping')}
-      </Button>
+    <div className={classes.stack}>
+      <div>
+        <Button loading={preview.loading} onClick={() => preview.fetchPreview()}>
+          {i18n.t('Fetch a resource and preview the mapping')}
+        </Button>
+      </div>
 
       {preview.loading && <CircularLoader small />}
 
@@ -68,6 +72,7 @@ export const MappingPreview: FC<MappingPreviewProps> = ({ preview, onCodeMapping
       )}
 
       {preview.rows && preview.rows.length > 0 && (
+        <div className={classes.tableScroll}>
         <Table>
           <TableHead>
             <TableRowHead>
@@ -96,7 +101,7 @@ export const MappingPreview: FC<MappingPreviewProps> = ({ preview, onCodeMapping
                         ))}
                       </SingleSelect>
                       {!row.codeMapping.resolvedOptionCode && (
-                        <NoticeBox warning title={i18n.t('Not yet mapped -- omitted from what gets written')} />
+                        <Help warning>{i18n.t('Not yet mapped -- omitted from what gets written')}</Help>
                       )}
                     </>
                   ) : (
@@ -107,6 +112,7 @@ export const MappingPreview: FC<MappingPreviewProps> = ({ preview, onCodeMapping
             ))}
           </TableBody>
         </Table>
+        </div>
       )}
     </div>
   )

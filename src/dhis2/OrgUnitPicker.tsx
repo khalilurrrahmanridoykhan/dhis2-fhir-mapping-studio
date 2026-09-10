@@ -2,6 +2,7 @@ import { useDataQuery } from '@dhis2/app-runtime'
 import { CircularLoader, NoticeBox, OrganisationUnitTree } from '@dhis2/ui'
 import i18n from '@dhis2/d2-i18n'
 import React, { FC, useState } from 'react'
+import classes from './OrgUnitPicker.module.css'
 
 interface OrgUnitRootsResponse {
   roots: { organisationUnits: { id: string }[] }
@@ -53,14 +54,16 @@ export const OrgUnitPicker: FC<OrgUnitPickerProps> = ({ onSelect }) => {
   }
 
   return (
-    <OrganisationUnitTree
-      roots={roots}
-      singleSelection
-      selected={selectedPath ? [selectedPath] : []}
-      onChange={(payload: { id: string; path: string }) => {
-        setSelectedPath(payload.path)
-        onSelect(payload.id)
-      }}
-    />
+    <div className={classes.treeBox}>
+      <OrganisationUnitTree
+        roots={roots}
+        singleSelection
+        selected={selectedPath ? [selectedPath] : []}
+        onChange={(payload: { id: string; path: string }) => {
+          setSelectedPath(payload.path)
+          onSelect(payload.id)
+        }}
+      />
+    </div>
   )
 }

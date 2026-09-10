@@ -1,5 +1,5 @@
 import type { DhisDataElement } from '../dhis2/types'
-import { extractCodeableConcept } from '../fhir/extractCodeableConcept'
+import { extractCodeableConcept, observedConceptKey } from '../fhir/extractCodeableConcept'
 import type { CodeMapping } from '../mapping/MappingProfile'
 import { toDhisDataValue } from './toDhisDataValue'
 
@@ -9,7 +9,8 @@ import { toDhisDataValue } from './toDhisDataValue'
  * one data element, applying the profile's saved code translations for a
  * CodeableConcept-typed field mapped onto an OPTION_SET data element.
  *
- * For that specific combination (OPTION_SET + a real observed code):
+ * For that specific combination (OPTION_SET + a concept with a code, or
+ * failing that a text label -- observedConceptKey):
  * - a saved translation exists -> writes the real DHIS2 option code, not
  *   display text.
  * - no translation exists yet -> returns null (omit), deliberately NOT
@@ -27,7 +28,7 @@ import { toDhisDataValue } from './toDhisDataValue'
 export function resolveDataValue(dataElement: DhisDataElement, rawValue: unknown, codeMappings: CodeMapping[] | undefined): string | null {
   if (dataElement.optionSet) {
     const codeableConcept = extractCodeableConcept(rawValue)
-    const observedCode = codeableConcept?.coding?.[0]?.code
+    const observedCode = codeableConcept ? observedConceptKey(codeableConcept) : undefined
     if (observedCode) {
       return codeMappings?.find((c) => c.fhirCode === observedCode)?.dhisOptionCode ?? null
     }

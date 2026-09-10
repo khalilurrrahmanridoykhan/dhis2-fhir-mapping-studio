@@ -1,6 +1,6 @@
 import type { DhisOptionSet, DhisTargetProgram } from '../dhis2/types'
 import { immunizationIgFields } from '../fhir/immunizationIgFields'
-import { extractCodeableConcept } from '../fhir/extractCodeableConcept'
+import { extractCodeableConcept, observedConceptKey } from '../fhir/extractCodeableConcept'
 import { formatFhirValue } from '../fhir/formatFhirValue'
 import { readImmunizationField } from '../fhir/readImmunizationField'
 import { dhisOptionCodeFor, fhirFieldMappedTo, type MappingProfile } from './MappingProfile'
@@ -75,7 +75,7 @@ export function buildMappingPreview(
     let codeMapping: MappingPreviewRowCodeMapping | null = null
     if (dataElement.optionSet) {
       const codeableConcept = extractCodeableConcept(rawValue)
-      const observedCode = codeableConcept?.coding?.[0]?.code
+      const observedCode = codeableConcept ? observedConceptKey(codeableConcept) : undefined
       if (observedCode) {
         codeMapping = {
           optionSet: dataElement.optionSet,

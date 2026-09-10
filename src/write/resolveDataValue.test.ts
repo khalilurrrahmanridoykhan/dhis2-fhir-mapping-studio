@@ -37,4 +37,10 @@ describe('resolveDataValue', () => {
     const value = resolveDataValue(optionSetDataElement, 'completed', undefined)
     expect(value).toBe('completed')
   })
+
+  it('translates a text-only concept by its text (real FHIR servers send vaccineCode as text-only)', () => {
+    const textOnly = { text: 'Influenza, seasonal' }
+    expect(resolveDataValue(optionSetDataElement, textOnly, [{ fhirCode: 'Influenza, seasonal', dhisOptionCode: 'FLU' }])).toBe('FLU')
+    expect(resolveDataValue(optionSetDataElement, textOnly, [])).toBeNull()
+  })
 })

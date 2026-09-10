@@ -126,4 +126,11 @@ describe('buildMappingPreview -- code mapping', () => {
     const rows = buildMappingPreview(optionSetProgram, profile, resourceWithoutVaccineCode)
     expect(rows[0].codeMapping).toBeNull()
   })
+
+  it('uses the concept text as the observed code when vaccineCode is text-only (no coding array)', () => {
+    const profile = setFieldMapping(emptyOptionSetProfile, 'de-vaccine', 'vaccineCode')
+    const textOnlyResource = { resourceType: 'Immunization', id: 'r3', status: 'completed', vaccineCode: { text: 'Influenza, seasonal' } }
+    const rows = buildMappingPreview(optionSetProgram, profile, textOnlyResource)
+    expect(rows[0].codeMapping).toMatchObject({ observedCode: 'Influenza, seasonal', observedDisplay: 'Influenza, seasonal' })
+  })
 })

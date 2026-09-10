@@ -32,5 +32,16 @@
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.7",
     "typescript": "^5.9.3"
-  }
+  },
+  "author": "Khalilur Rahman Ridoy Khan <khalilurrahmanridoykhan@gmail.com>",
+  "keywords": [
+    "dhis2",
+    "dhis2-app",
+    "fhir",
+    "immunization",
+    "who-smart-guidelines",
+    "interoperability",
+    "health-informatics",
+    "tracker"
+  ]
 }

@@ -46,12 +46,23 @@ All notable changes to this project are documented here. Format follows
 
 ### Verified against a real DHIS2 instance
 
-A live smoke test against `play.im.dhis2.org` and a real HAPI FHIR
-server confirmed the program-browse query, the route-list query, and the
-whole Tracker write contract (`status`, the created event id path,
-the validation-error shape, and that DHIS2 accepts FHIR's
-`occurrenceDateTime` format directly as `occurredAt`). It also drove
-three fixes:
+Every HTTP contract this app depends on has been exercised against a real
+DHIS2 instance (2.42.5) with a real Route to a real FHIR server, not just
+mocks:
+
+- **Route creation** (`POST /api/routes` with this app's exact payload)
+  and **route sharing** (`POST /api/sharing?type=route&id=…` granting
+  `r-------`) both succeed; the route's `auth` config is write-only
+  (never returned from a GET), confirming credentials stay server-side.
+- **Fetch through the route** (`GET /api/routes/{id}/run/Immunization`)
+  returns a real FHIR `Bundle` with `Content-Type: application/fhir+json`
+  -- the exact case this app handles with a raw `fetch()` because
+  `@dhis2/data-engine` would not parse it.
+- **The full write path** -- a resource fetched through the route, mapped,
+  and written as one Tracker event -- lands correctly, with every mapped
+  `dataValue` stored as expected and the real event id returned.
+
+An earlier smoke test against `play.im.dhis2.org` drove three fixes:
 
 - Step 4 now warns, naming them, when a **compulsory** data element will
   have no value -- rather than letting the write fail with a raw `E1303`.
@@ -60,6 +71,10 @@ three fixes:
 - Confirmed the app correctly keys "is this a coded field" off the
   `optionSet`'s presence, not the `valueType` string (a real instance
   reports an option-set element as `valueType: "TEXT"`).
+
+Not yet verified: an actual browser click-through of the built app UI
+against a live instance, and the coded-field-to-OPTION_SET path
+end to end (needs an event program with an option-set data element).
 
 Known, deliberate limitation: one resource at a time -- no multi-resource
 batch sync yet.

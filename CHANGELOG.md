@@ -61,6 +61,13 @@ mocks:
 - **The full write path** -- a resource fetched through the route, mapped,
   and written as one Tracker event -- lands correctly, with every mapped
   `dataValue` stored as expected and the real event id returned.
+- **The coded-field path**, against a purpose-built event program with an
+  option-set data element: with no code translation the value is omitted
+  and the event still writes; sending the raw FHIR text instead is
+  rejected by DHIS2 (`"… is not a valid option code in OptionSet …"`) --
+  which is exactly why the translation step exists; with the translation
+  applied, the real option code is accepted and stored. (Test metadata
+  and events were removed afterward.)
 
 An earlier smoke test against `play.im.dhis2.org` drove three fixes:
 
@@ -73,8 +80,9 @@ An earlier smoke test against `play.im.dhis2.org` drove three fixes:
   reports an option-set element as `valueType: "TEXT"`).
 
 Not yet verified: an actual browser click-through of the built app UI
-against a live instance, and the coded-field-to-OPTION_SET path
-end to end (needs an event program with an option-set data element).
+against a live instance (the HTTP contracts it drives are all confirmed
+above; the React UI wiring on top of them is covered only by component
+tests).
 
 Known, deliberate limitation: one resource at a time -- no multi-resource
 batch sync yet.

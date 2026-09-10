@@ -1,15 +1,15 @@
-import { CustomDataProvider } from '@dhis2/app-runtime'
 import { act, renderHook, waitFor } from '@testing-library/react'
 import React from 'react'
 import { useWriteMappedEvent } from './useWriteMappedEvent'
 import { setFieldMapping, type MappingProfile } from '../mapping/MappingProfile'
 import type { DhisTargetProgram } from '../dhis2/types'
+import { customDataWrapper as wrapper } from '../test-utils/customDataProvider'
 
 const program: DhisTargetProgram = {
   id: 'prog1',
   name: 'Immunization program',
   programStages: [
-    { id: 'stage1', name: 'Immunization stage', programStageDataElements: [{ dataElement: { id: 'de-status', name: 'Status', valueType: 'TEXT' } }] },
+    { id: 'stage1', name: 'Immunization stage', programStageDataElements: [{ compulsory: false, dataElement: { id: 'de-status', name: 'Status', valueType: 'TEXT' } }] },
   ],
 }
 
@@ -20,10 +20,6 @@ const mappedProfile: MappingProfile = setFieldMapping(
 )
 
 const conformantResource = { resourceType: 'Immunization', id: 'r1', status: 'completed', occurrenceDateTime: '2026-06-30T09:00:00+00:00' }
-
-function wrapper(data: Record<string, unknown>) {
-  return ({ children }: { children: React.ReactNode }) => <CustomDataProvider data={data}>{children}</CustomDataProvider>
-}
 
 describe('useWriteMappedEvent', () => {
   it('does nothing when no org unit has been picked yet', async () => {

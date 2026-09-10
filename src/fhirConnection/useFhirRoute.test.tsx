@@ -1,12 +1,8 @@
-import { CustomDataProvider } from '@dhis2/app-runtime'
 import { act, renderHook, waitFor } from '@testing-library/react'
 import React from 'react'
 import { useFhirRoute } from './useFhirRoute'
 import type { CreateRouteInput } from './types'
-
-function wrapper(data: Record<string, unknown>) {
-  return ({ children }: { children: React.ReactNode }) => <CustomDataProvider data={data}>{children}</CustomDataProvider>
-}
+import { customDataWrapper as wrapper } from '../test-utils/customDataProvider'
 
 describe('useFhirRoute', () => {
   it('lists only wildcard routes, filtering out ones that cannot proxy an arbitrary FHIR sub-path', async () => {

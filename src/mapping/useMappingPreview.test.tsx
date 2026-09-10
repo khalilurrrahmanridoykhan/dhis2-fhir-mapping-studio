@@ -18,7 +18,7 @@ const program: DhisTargetProgram = {
     {
       id: 'stage1',
       name: 'Immunization stage',
-      programStageDataElements: [{ dataElement: { id: 'de-status', name: 'Vaccination status', valueType: 'TEXT' } }],
+      programStageDataElements: [{ compulsory: false, dataElement: { id: 'de-status', name: 'Vaccination status', valueType: 'TEXT' } }],
     },
   ],
 }

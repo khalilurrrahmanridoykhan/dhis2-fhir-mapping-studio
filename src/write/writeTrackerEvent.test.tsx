@@ -1,8 +1,9 @@
-import { CustomDataProvider, useDataEngine } from '@dhis2/app-runtime'
+import { useDataEngine } from '@dhis2/app-runtime'
 import { renderHook, waitFor } from '@testing-library/react'
 import React from 'react'
 import { writeTrackerEvent } from './writeTrackerEvent'
 import type { TrackerEventPayload } from './buildTrackerEventPayload'
+import { customDataWrapper as wrapper } from '../test-utils/customDataProvider'
 
 const payload: TrackerEventPayload = {
   events: [
@@ -15,10 +16,6 @@ const payload: TrackerEventPayload = {
       dataValues: [{ dataElement: 'de-status', value: 'completed' }],
     },
   ],
-}
-
-function wrapper(data: Record<string, unknown>) {
-  return ({ children }: { children: React.ReactNode }) => <CustomDataProvider data={data}>{children}</CustomDataProvider>
 }
 
 describe('writeTrackerEvent', () => {

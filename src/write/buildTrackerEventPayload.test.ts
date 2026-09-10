@@ -10,8 +10,8 @@ const program: DhisTargetProgram = {
       id: 'stage1',
       name: 'Immunization stage',
       programStageDataElements: [
-        { dataElement: { id: 'de-status', name: 'Vaccination status', valueType: 'TEXT' } },
-        { dataElement: { id: 'de-vaccine', name: 'Vaccine given', valueType: 'TEXT' } },
+        { compulsory: false, dataElement: { id: 'de-status', name: 'Vaccination status', valueType: 'TEXT' } },
+        { compulsory: false, dataElement: { id: 'de-vaccine', name: 'Vaccine given', valueType: 'TEXT' } },
       ],
     },
   ],
@@ -81,7 +81,7 @@ describe('buildTrackerEventPayload -- code mapping', () => {
         id: 'stage1',
         name: 'Immunization stage',
         programStageDataElements: [
-          { dataElement: { id: 'de-vaccine', name: 'Vaccine given', valueType: 'OPTION_SET', optionSet: vaccineOptionSet } },
+          { compulsory: false, dataElement: { id: 'de-vaccine', name: 'Vaccine given', valueType: 'OPTION_SET', optionSet: vaccineOptionSet } },
         ],
       },
     ],

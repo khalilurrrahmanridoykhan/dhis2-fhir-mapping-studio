@@ -1,8 +1,8 @@
-import { CustomDataProvider } from '@dhis2/app-runtime'
 import { act, renderHook, waitFor } from '@testing-library/react'
 import React from 'react'
 import type { DhisTargetProgram } from '../dhis2/types'
 import { useMappingProfile } from './useMappingProfile'
+import { customDataWrapper as wrapper } from '../test-utils/customDataProvider'
 
 const program: DhisTargetProgram = {
   id: 'prog1',
@@ -16,9 +16,6 @@ class MockNotFoundError extends Error {
   details = { httpStatusCode: 404 }
 }
 
-function wrapper(data: Record<string, unknown>) {
-  return ({ children }: { children: React.ReactNode }) => <CustomDataProvider data={data}>{children}</CustomDataProvider>
-}
 
 describe('useMappingProfile', () => {
   it('starts with a fresh empty profile when nothing has been saved for this program yet', async () => {

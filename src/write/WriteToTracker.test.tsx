@@ -4,6 +4,7 @@ import '@testing-library/jest-dom'
 import React from 'react'
 import { WriteToTracker } from './WriteToTracker'
 import type { useWriteMappedEvent } from './useWriteMappedEvent'
+import type { MockData } from '../test-utils/customDataProvider'
 
 type WriteResult = ReturnType<typeof useWriteMappedEvent>
 
@@ -20,8 +21,8 @@ function makeWrite(overrides: Partial<WriteResult> = {}): WriteResult {
   }
 }
 
-function renderWithProvider(ui: React.ReactElement, data: Record<string, unknown> = { organisationUnits: { organisationUnits: [] } }) {
-  return render(<CustomDataProvider data={data}>{ui}</CustomDataProvider>)
+function renderWithProvider(ui: React.ReactElement, data: MockData = { organisationUnits: { organisationUnits: [] } }) {
+  return render(<CustomDataProvider data={data as never}>{ui}</CustomDataProvider>)
 }
 
 describe('WriteToTracker', () => {

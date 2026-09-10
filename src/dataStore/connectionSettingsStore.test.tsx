@@ -1,16 +1,13 @@
-import { CustomDataProvider, useDataEngine } from '@dhis2/app-runtime'
+import { useDataEngine } from '@dhis2/app-runtime'
 import { renderHook, waitFor } from '@testing-library/react'
 import React from 'react'
 import { loadConnectionSettings, saveConnectionSettings } from './connectionSettingsStore'
+import { customDataWrapper as wrapper } from '../test-utils/customDataProvider'
 
 const RESOURCE = 'dataStore/fhirMappingStudio/connection'
 
 class MockNotFoundError extends Error {
   details = { httpStatusCode: 404 }
-}
-
-function wrapper(data: Record<string, unknown>) {
-  return ({ children }: { children: React.ReactNode }) => <CustomDataProvider data={data}>{children}</CustomDataProvider>
 }
 
 describe('loadConnectionSettings', () => {

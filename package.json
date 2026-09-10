@@ -14,6 +14,7 @@
   },
   "scripts": {
     "build": "d2-app-scripts build",
+    "typecheck": "tsc --noEmit",
     "start": "d2-app-scripts start",
     "test": "d2-app-scripts test",
     "deploy": "d2-app-scripts deploy"

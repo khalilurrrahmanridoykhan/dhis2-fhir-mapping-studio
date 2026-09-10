@@ -1,11 +1,7 @@
-import { CustomDataProvider } from '@dhis2/app-runtime'
 import { renderHook, waitFor } from '@testing-library/react'
 import React from 'react'
 import { useCurrentUserAuthorities } from './useCurrentUserAuthorities'
-
-function wrapper(data: Record<string, unknown>) {
-  return ({ children }: { children: React.ReactNode }) => <CustomDataProvider data={data}>{children}</CustomDataProvider>
-}
+import { customDataWrapper as wrapper } from '../test-utils/customDataProvider'
 
 describe('useCurrentUserAuthorities', () => {
   it('grants canCreateRoutes for a superuser (ALL)', async () => {

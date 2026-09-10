@@ -1,8 +1,9 @@
-import { CustomDataProvider, useDataEngine } from '@dhis2/app-runtime'
+import { useDataEngine } from '@dhis2/app-runtime'
 import { renderHook, waitFor } from '@testing-library/react'
 import React from 'react'
 import { loadMappingProfile, saveMappingProfile } from './mappingProfileStore'
 import type { MappingProfile } from '../mapping/MappingProfile'
+import { customDataWrapper as wrapper } from '../test-utils/customDataProvider'
 
 const PROGRAM_ID = 'prog1'
 const RESOURCE = `dataStore/fhirMappingStudio/mappingProfile-${PROGRAM_ID}`
@@ -18,10 +19,6 @@ const sampleProfile: MappingProfile = {
 // is exercised the same way a real 404 response would trigger it.
 class MockNotFoundError extends Error {
   details = { httpStatusCode: 404 }
-}
-
-function wrapper(data: Record<string, unknown>) {
-  return ({ children }: { children: React.ReactNode }) => <CustomDataProvider data={data}>{children}</CustomDataProvider>
 }
 
 describe('loadMappingProfile', () => {

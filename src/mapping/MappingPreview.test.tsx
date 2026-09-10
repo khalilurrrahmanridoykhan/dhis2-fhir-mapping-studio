@@ -58,8 +58,8 @@ describe('MappingPreview', () => {
       makePreview({
         resourceCount: 1,
         rows: [
-          { dhisDataElementId: 'de1', dhisDataElementName: 'Vaccination status', fhirFieldPath: 'status', fhirFieldLabel: 'Status', displayValue: 'completed', codeMapping: null },
-          { dhisDataElementId: 'de2', dhisDataElementName: 'Unrelated field', fhirFieldPath: null, fhirFieldLabel: null, displayValue: 'Not mapped', codeMapping: null },
+          { dhisDataElementId: 'de1', dhisDataElementName: 'Vaccination status', fhirFieldPath: 'status', fhirFieldLabel: 'Status', displayValue: 'completed', codeMapping: null, compulsory: false, willBeWritten: true },
+          { dhisDataElementId: 'de2', dhisDataElementName: 'Unrelated field', fhirFieldPath: null, fhirFieldLabel: null, displayValue: 'Not mapped', codeMapping: null, compulsory: false, willBeWritten: false },
         ],
       })
     )
@@ -116,6 +116,8 @@ describe('MappingPreview', () => {
         fhirFieldPath: 'vaccineCode',
         fhirFieldLabel: 'Vaccine code',
         displayValue: 'Yellow fever vaccine',
+        compulsory: false,
+        willBeWritten: overrides.resolvedOptionCode !== null,
         codeMapping: {
           optionSet: vaccineOptionSet,
           observedCode: 'YF',

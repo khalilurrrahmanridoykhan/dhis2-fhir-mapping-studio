@@ -54,7 +54,10 @@ export const RoutePicker: FC<RoutePickerProps> = ({ fhirRoute, authorities, sele
       )}
 
       <div className={classes.buttonRow}>
-        <Button small onClick={() => window.open('../route-manager/index.html', '_blank')}>
+        <Button
+          small
+          onClick={() => window.open('../route-manager/index.html', '_blank', 'noopener,noreferrer')}
+        >
           {i18n.t('Open Route Manager')}
         </Button>
         {authorities.canCreateRoutes && (

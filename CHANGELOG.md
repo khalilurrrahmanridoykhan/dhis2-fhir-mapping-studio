@@ -6,6 +6,10 @@ All notable changes to this project are documented here. Format follows
 
 ## [Unreleased]
 
+Nothing yet.
+
+## [1.0.0] - 2026-09-11
+
 ### Added
 
 - WHO SMART Guidelines Immunization IG field reference (22 fields, verified
@@ -58,6 +62,15 @@ All notable changes to this project are documented here. Format follows
   source.
 - CI now also runs `tsc --noEmit`; build tooling pinned to a stable
   release.
+- Checked against the DHIS2 App Hub's own published submission
+  guidelines: fixed `window.open(..., '_blank')` (Route Manager link) to
+  pass `noopener,noreferrer`, matching the guideline's `rel="noreferrer"`
+  requirement for external `target="_blank"` links. Everything else in
+  the guidelines (routes for external calls, cookie-session auth, no
+  external scripts/stylesheets, no hardcoded credentials, unique
+  dataStore namespace, React's default XSS protection) was already true
+  of this app, not newly added.
+- First submittable release: version bumped to `1.0.0`.
 
 ### Verified against a real DHIS2 instance
 
@@ -94,10 +107,10 @@ An earlier smoke test against `play.im.dhis2.org` drove three fixes:
   `optionSet`'s presence, not the `valueType` string (a real instance
   reports an option-set element as `valueType: "TEXT"`).
 
-Not yet verified: an actual browser click-through of the built app UI
-against a live instance (the HTTP contracts it drives are all confirmed
-above; the React UI wiring on top of them is covered only by component
-tests).
+Also run end to end in a real browser against a live instance by the
+app's own author -- connect, map, preview, and a real write producing a
+real Tracker event id, confirming the UI wiring on top of the
+contracts above, not just the contracts themselves.
 
 Known, deliberate limitation: one resource at a time -- no multi-resource
 batch sync yet.

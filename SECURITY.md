@@ -15,8 +15,7 @@ DHIS2 instance it's installed on. It has no server of its own.
 - **FHIR server credentials never reach the browser.** A FHIR server is reached
   only through a DHIS2 [Route](https://docs.dhis2.org/en/develop/using-the-api/dhis-core-version-master/route.html).
   The Route's `auth` block is a write-only property -- DHIS2 never returns it from
-  a `GET`, regardless of the caller's permissions (verified live against a real
-  instance). The app sends a credential once, in the `POST /api/routes` body, to
+  a `GET`, regardless of the caller's permissions. The app sends a credential once, in the `POST /api/routes` body, to
   the instance's own API; from then on the instance makes the outbound call.
 - **No third-party network calls.** Every request goes to the same-origin DHIS2
   API (`/api/*`, including `/api/routes/{id}/run/...`). There is no analytics, no
@@ -41,7 +40,7 @@ DHIS2 App Platform's own dependency tree, shared by every app built on it:
   `@dhis2/app-adapter`. It can only be updated upstream in `@dhis2/ui`.
 - `loader-utils` comes only from build tooling (`babel-loader`, `file-loader`,
   the react-refresh webpack plugin, the styled-jsx compiler). It is **not** in
-  the shipped bundle -- confirmed against the build output.
+  the shipped bundle.
 
 This app pins no vulnerable package directly and adds none of its own.
 `npm audit fix` cannot resolve these without overriding DHIS2 platform packages,

@@ -4,7 +4,7 @@ const config = {
     name: 'fhir-mapping-studio',
     title: 'FHIR Mapping Studio',
     description:
-        'Author a mapping from the WHO SMART Guidelines Immunization IG onto an instance\'s own programme and data elements, fetch a real resource through a DHIS2 Route, preview exactly what the mapping produces, and write it into Tracker -- with no separate backend.',
+        'Map FHIR Immunization data (WHO SMART Guidelines IG) onto your own DHIS2 programme, preview what a real resource produces, and write it to Tracker. The FHIR server is reached only through a DHIS2 Route, so no separate backend is needed.',
 
     // Tracker API + Routes have been stable well before this floor; matches
     // the same minDHIS2Version discipline every sibling app in this family
